@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Stay</title>
+<style>
+:root{
+  --orange:#ff914d;
+  --orange-dark:#f4772e;
+  --teal:#0796a9;
+  --teal-dark:#087b8a;
+  --ink:#151515;
+  --muted:#6d6d75;
+  --line:#d7d7dc;
+  --soft:#eef9fa;
+  --white:#fff;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:linear-gradient(135deg,#078b9d,#0a7890);
+  color:var(--ink);
+}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{
+  width:min(100%,900px);
+  min-height:100vh;
+  margin:auto;
+  background:#fff;
+  overflow:hidden;
+}
+.screen{display:none;min-height:100vh}
+.screen.active{display:block}
+
+.role-screen{min-height:100vh;padding:48px 34px;display:flex;align-items:center;justify-content:center}
+.role-wrap{width:min(100%,760px);text-align:center}
+.role-wrap h1{font-size:56px;line-height:1;margin:0 0 12px;font-weight:800;letter-spacing:-2px}
+.role-wrap .subtitle{font-size:18px;color:var(--muted);margin-bottom:38px}
+.role-options{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
+.role-card{border:1.5px solid #d2d2d6;border-radius:22px;background:#fff;padding:34px 24px;min-height:250px;text-align:left;transition:.2s;box-shadow:0 5px 18px rgba(0,0,0,.04)}
+.role-card:hover{transform:translateY(-4px);border-color:var(--orange);box-shadow:0 12px 25px rgba(255,145,77,.18)}
+.role-icon{width:70px;height:70px;border-radius:20px;background:#fff1e8;color:var(--orange);display:flex;align-items:center;justify-content:center;font-size:38px;margin-bottom:20px}
+.role-card h2{font-size:26px;margin:0 0 10px}
+.role-card p{color:var(--muted);line-height:1.5;margin:0 0 22px}
+.role-card .role-button{width:100%;border:0;border-radius:10px;background:var(--orange);color:#fff;padding:14px;font-weight:700;font-size:16px}
+@media(max-width:600px){.role-options{grid-template-columns:1fr}.role-wrap h1{font-size:46px}}
+
+.auth{
+  max-width:430px;
+  margin:auto;
+  padding:46px 40px 50px;
+}
+.auth h1{
+  font-size:58px;line-height:.98;margin:0 0 10px;font-weight:800;
+  letter-spacing:-2px;
+}
+.auth .close{
+  position:absolute;right:28px;top:28px;
+  width:34px;height:34px;border:0;border-radius:50%;
+  background:var(--orange);color:#fff;font-size:24px;
+}
+.auth .switch{font-size:15px;margin-bottom:8px}
+.auth .switch a{font-weight:700;text-decoration:underline;color:var(--ink);cursor:pointer}
+.hero-img{
+  height:190px;border:3px solid #111;border-radius:3px;margin:8px 4px 12px;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.08),transparent),
+    linear-gradient(135deg,#d9d9d9 0 20%,#0e7f83 20% 62%,#f3f0e9 62%);
+  position:relative;overflow:hidden;
+}
+.hero-img:before,.hero-img:after{
+  content:"";position:absolute;bottom:0;width:28%;height:68%;
+  background:linear-gradient(#f7f7f7 0 72%,#c5c5c5 72%);
+  box-shadow:inset 0 0 0 3px #aaa;
+}
+.hero-img:before{left:14%}.hero-img:after{right:14%}
+.field{
+  width:100%;height:62px;border:1.5px solid #111;border-radius:8px;
+  display:flex;align-items:center;gap:14px;padding:0 20px;margin:18px 0;
+  color:var(--orange);background:#fff;
+}
+.field input{border:0;outline:0;width:100%;font-size:20px;color:var(--ink)}
+.field input::placeholder{color:var(--orange)}
+.field .icon{font-size:23px;color:#111}
+.primary{
+  display:block;margin:32px auto 0;width:165px;height:58px;
+  background:var(--orange);border:2px solid #111;color:#fff;font-size:35px;
+  border-radius:0;transition:.2s;
+}
+.primary:hover,.cta:hover{background:var(--orange-dark);transform:translateY(-1px)}
+.error{color:#c62828;font-size:13px;min-height:18px;margin-top:-8px}
+.dashboard{padding-bottom:85px}
+.top{
+  padding:48px 46px 18px;display:flex;justify-content:space-between;align-items:flex-start;
+}
+.greeting{font-size:48px;font-weight:800;line-height:1.05;letter-spacing:-1.5px}
+.greeting span{display:block}
+.bell{font-size:34px;position:relative}
+.bell:after{content:"";position:absolute;width:10px;height:10px;background:var(--orange);border-radius:50%;right:-2px;top:-2px}
+.location{padding:0 46px;font-size:20px}
+.tag{margin:20px 46px 18px;padding:10px 14px;background:#f2f3f4;border-radius:13px;display:inline-block;font-size:16px}
+.search{margin:0 46px 24px;height:64px;border:1px solid #bbb;border-radius:14px;display:flex;align-items:center;padding:0 22px;gap:15px}
+.search input{border:0;outline:0;width:100%;font-size:18px}
+.filters{display:flex;gap:12px;padding:0 28px;overflow:auto}
+.filter{min-width:125px;height:82px;background:#fff;border:1px solid #c8c8cc;border-radius:12px;padding:12px;font-weight:700}
+.filter.active{background:var(--orange);color:#fff;border-color:var(--orange)}
+.section{padding:28px 46px 0}
+.section-title{display:flex;justify-content:space-between;align-items:center;font-size:25px;font-weight:800;margin-bottom:16px}
+.section-title a{font-size:16px;color:var(--orange);cursor:pointer}
+.feature{
+  border:1px solid #d3d3d3;border-radius:18px;overflow:hidden;
+  display:grid;grid-template-columns:1fr 1fr;
+}
+.property-img{
+  min-height:290px;
+  background:
+    linear-gradient(145deg,rgba(0,0,0,.08),transparent),
+    linear-gradient(135deg,#e7e5df 0 20%,#1b8d8b 20% 64%,#eee8df 64%);
+  position:relative;
+}
+.property-img:before,.property-img:after{
+  content:"";position:absolute;bottom:0;width:28%;height:57%;background:#f5f5f5;
+  box-shadow:inset 0 0 0 3px #bbb;
+}
+.property-img:before{left:13%}.property-img:after{right:13%}
+.property-info{padding:22px}
+.property-info h3{font-size:25px;margin:15px 0}
+.rating{color:var(--orange);font-size:20px}
+.price{color:var(--orange);font-size:28px;font-weight:800;margin:12px 0}
+.cta{border:0;border-radius:10px;background:var(--orange);color:#fff;padding:14px 22px;font-weight:700;font-size:17px}
+.cards{display:flex;gap:14px;overflow:auto}
+.card{min-width:190px;border:1px solid #d4d4d4;border-radius:14px;overflow:hidden;background:#fff}
+.card-img{height:115px;background:linear-gradient(145deg,#6b9fbd,#e5e5e5 45%,#9a7665)}
+.card-body{padding:12px}.card h4{margin:0 0 8px;font-size:17px}
+.card .price{font-size:18px}.small{font-size:13px;color:#555}
+.trust{margin:28px 46px;background:#effafa;padding:20px;border-radius:15px;display:flex;gap:14px;align-items:center}
+.trust-icon{font-size:36px;color:var(--teal)}
+.nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:min(100%,900px);background:#fff;border-top:1px solid #ddd;
+  display:flex;justify-content:space-around;padding:12px 8px 10px;z-index:10
+}
+.nav button{border:0;background:none;font-size:12px;color:#111;display:flex;flex-direction:column;align-items:center;gap:4px}
+.nav button.active{color:var(--orange)}
+.nav .nav-icon{font-size:25px}
+.modal{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;
+  align-items:center;justify-content:center;padding:20px
+}
+.modal.open{display:flex}
+.modal-box{background:#fff;border-radius:18px;padding:26px;max-width:460px;width:100%}
+.modal-box h2{margin-top:0}.modal-box input,.modal-box select{width:100%;padding:13px;margin:7px 0 14px;border:1px solid #bbb;border-radius:8px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+.secondary{border:1px solid #aaa;background:#fff;padding:12px 18px;border-radius:8px}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#151515;color:#fff;padding:12px 18px;border-radius:8px;display:none;z-index:30}
+.toast.show{display:block}
+@media(max-width:600px){
+  .auth{padding:42px 40px}
+  .auth h1{font-size:54px}
+  .top{padding:34px 28px 16px}.greeting{font-size:38px}
+  .location{padding:0 28px}.tag{margin-left:28px;margin-right:28px}
+  .search{margin-left:28px;margin-right:28px}
+  .section{padding-left:28px;padding-right:28px}
+  .trust{margin-left:28px;margin-right:28px}
+  .feature{grid-template-columns:1fr}
+  .property-img{min-height:220px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<section id="roleScreen" class="screen active">
+  <div class="role-screen">
+    <div class="role-wrap">
+      <h1>Student Stay</h1>
+      <div class="subtitle">How would you like to use Student Stay?</div>
+      <div class="role-options">
+        <div class="role-card">
+          <div class="role-icon"></div>
+          <h2>Student</h2>
+          <p>Find verified student accommodation and discover a place to stay across South Africa.</p>
+          <button class="role-button" onclick="chooseRole('student')">Continue as Student →</button>
+        </div>
+        <div class="role-card">
+          <div class="role-icon"></div>
+          <h2>Landlord</h2>
+          <p>List and manage your student accommodation, tenants, and properties in one place.</p>
+          <button class="role-button" onclick="chooseRole('landlord')">Continue as Landlord →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="authScreen" class="screen">
+  <div class="auth">
+    <button class="close" onclick="showScreen('roleScreen')" aria-label="Close">×</button>
+    <h1 id="authTitle">Student<br>Stay</h1>
+    <div class="switch"><span id="switchText">Already registered?</span> <a id="switchLink" onclick="toggleAuth()">Sign in</a></div>
+    <div class="hero-img"></div>
+    <form id="authForm">
+      <div class="field"><span class="icon"></span><input id="nameInput" placeholder="Landlord Account Number" required></div>
+      <div class="field"><span class="icon"></span><input id="emailInput" type="email" placeholder="Email" required></div>
+      <div class="field"><span class="icon"></span><input id="passwordInput" type="password" placeholder="Password" minlength="6" required></div>
+      <div class="field"><span class="icon"></span><input id="idInput" placeholder="ID Number" required></div>
+      <div class="error" id="authError"></div>
+      <button class="primary" type="submit">→</button>
+    </form>
+  </div>
+</section>
+
+<section id="loginScreen" class="screen">
+  <div class="auth">
+    <button class="close" onclick="showScreen('authScreen')">×</button>
+    <h1>Student<br>Stay</h1>
+    <div class="switch">Don't have an account? <a onclick="showScreen('roleScreen')">Create account</a></div>
+    <div class="hero-img"></div>
+    <form id="loginForm">
+      <div class="field"><span class="icon"></span><input id="loginEmail" type="email" placeholder="Email" required></div>
+      <div class="field"><span class="icon"></span><input id="loginPassword" type="password" placeholder="Password" required></div>
+      <div class="error" id="loginError"></div>
+      <button class="primary" type="submit">→</button>
+    </form>
+  </div>
+</section>
+
+<section id="studentHomeScreen" class="screen dashboard">
+  <div class="top">
+    <div class="greeting">Good Morning,<span id="studentUserName">Student</span> </div>
+    <div class="bell"></div>
+  </div>
+  <div class="location"> South Africa　⌄</div>
+  <div class="tag">🇿🇦 Find verified student accommodation across South Africa</div>
+  <div class="search">⌕ <input placeholder="Search by university, city or suburb..."></div>
+  <div class="section">
+    <div class="section-title"><span>Popular in South Africa</span><a onclick="showToast('Showing all student accommodation')">View all ›</a></div>
+    <div class="feature">
+      <div class="property-img"></div>
+      <div class="property-info">
+        <div> Cape Town, Western Cape</div>
+        <h3>One Thibault Residence</h3>
+        <div class="rating">★★★★★ <span style="color:#333;font-size:14px">4.7 (128)</span></div>
+        <div class="price">R1 290/month</div>
+        <button class="cta" onclick="showToast('Opening accommodation details')">View Details →</button>
+      </div>
+    </div>
+  </div>
+  <div class="trust"><div class="trust-icon">✓</div><div><b>Safe. Verified. Student Friendly.</b><br><span class="small">Find trusted accommodation close to your university.</span></div></div>
+  <nav class="nav">
+    <button class="active" onclick="showScreen('studentHomeScreen')"><span class="nav-icon">⌂</span>Home</button>
+    <button onclick="showScreen('studentSavedScreen');renderSaved()"><span class="nav-icon">♡</span>Saved</button>
+    <button onclick="showScreen('studentSearchScreen');renderStudentListings()"><span class="nav-icon">⌕</span>Search</button>
+    <button onclick="showScreen('studentContactScreen');renderLandlords()"><span class="nav-icon">☎</span>Contact</button>
+    <button onclick="showScreen('studentProfileScreen');renderProfile()"><span class="nav-icon">◉</span>Profile</button>
+  </nav>
+</section>
+
+
+<section id="studentSearchScreen" class="screen dashboard">
+  <div class="top">
+    <div class="greeting">Find your<br><span>next home</span></div>
+    <div class="bell">♧</div>
+  </div>
+  <div class="search"><span style="font-size:28px">⌕</span><input id="studentSearchInput" placeholder="Search accommodation, city or university..."></div>
+  <div class="section">
+    <div class="section-title"><span>All Accommodations</span><span id="studentResultCount" style="font-size:14px;color:var(--muted)"></span></div>
+    <div class="cards student-list" id="studentAccommodationList"></div>
+  </div>
+  <nav class="nav">
+    <button onclick="showScreen('studentHomeScreen')"><span class="nav-icon">⌂</span>Home</button>
+    <button onclick="showScreen('studentSavedScreen');renderSaved()"><span class="nav-icon">♡</span>Saved</button>
+    <button class="active"><span class="nav-icon">⌕</span>Search</button>
+    <button onclick="showScreen('studentContactScreen')"><span class="nav-icon"></span>Contact</button>
+    <button onclick="showScreen('studentProfileScreen');renderProfile()"><span class="nav-icon">◉</span>Profile</button>
+  </nav>
+</section>
+
+<section id="studentSavedScreen" class="screen dashboard">
+  <div class="top">
+    <div class="greeting">Your<br><span>Saved Homes</span></div>
+    <div class="bell">♡</div>
+  </div>
+  <div class="section">
+    <div class="section-title"><span>Favourite Accommodations</span></div>
+    <div class="cards student-list" id="savedAccommodationList"></div>
+    <div id="emptySaved" style="text-align:center;color:var(--muted);padding:50px 10px;display:none">
+      You haven't saved any accommodations yet.<br><br>
+      Tap the ♡ on a property to save it here.
+    </div>
+  </div>
+  <nav class="nav">
+    <button onclick="showScreen('studentHomeScreen')"><span class="nav-icon">⌂</span>Home</button>
+    <button class="active"><span class="nav-icon">♡</span>Saved</button>
+    <button onclick="showScreen('studentSearchScreen');renderStudentListings()"><span class="nav-icon">⌕</span>Search</button>
+    <button onclick="showScreen('studentContactScreen')"><span class="nav-icon">☎</span>Contact</button>
+    <button onclick="showScreen('studentProfileScreen');renderProfile()"><span class="nav-icon">◉</span>Profile</button>
+  </nav>
+</section>
+
+<section id="studentContactScreen" class="screen dashboard">
+  <div class="top">
+    <div class="greeting">Contact<br><span>Landlords</span></div>
+    <div class="bell">☎</div>
+  </div>
+  <div class="section">
+    <div class="section-title"><span>Landlord Contact Details</span></div>
+    <div id="landlordList"></div>
+  </div>
+  <nav class="nav">
+    <button onclick="showScreen('studentHomeScreen')"><span class="nav-icon">⌂</span>Home</button>
+    <button onclick="showScreen('studentSavedScreen');renderSaved()"><span class="nav-icon">♡</span>Saved</button>
+    <button onclick="showScreen('studentSearchScreen');renderStudentListings()"><span class="nav-icon">⌕</span>Search</button>
+    <button class="active"><span class="nav-icon">☎</span>Contact</button>
+    <button onclick="showScreen('studentProfileScreen');renderProfile()"><span class="nav-icon">◉</span>Profile</button>
+  </nav>
+</section>
+
+<section id="studentProfileScreen" class="screen dashboard">
+  <div class="top">
+    <div class="greeting">Your<br><span>Profile</span></div>
+    <div class="bell">◉</div>
+  </div>
+  <div class="section">
+    <div class="profile-box" style="border:1px solid #ddd;border-radius:18px;padding:28px;text-align:center">
+      <div style="width:86px;height:86px;border-radius:50%;background:#fff1e8;color:var(--orange);display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto 18px">👤</div>
+      <h2 id="profileName" style="margin:0 0 8px">Student</h2>
+      <p id="profileEmail" style="color:var(--muted);margin:0 0 22px">email@example.com</p>
+      <div style="text-align:left;border-top:1px solid #eee;padding-top:18px;line-height:2">
+        <b>Account Type:</b> Student<br>
+        <b>Location:</b> South Africa<br>
+        <b>Saved Homes:</b> <span id="profileSavedCount">0</span>
+      </div>
+      <button class="cta" style="margin-top:20px" onclick="logout()">Log Out</button>
+    </div>
+  </div>
+  <nav class="nav">
+    <button onclick="showScreen('studentHomeScreen')"><span class="nav-icon">⌂</span>Home</button>
+    <button onclick="showScreen('studentSavedScreen');renderSaved()"><span class="nav-icon">♡</span>Saved</button>
+    <button onclick="showScreen('studentSearchScreen');renderStudentListings()"><span class="nav-icon">⌕</span>Search</button>
+    <button onclick="showScreen('studentContactScreen')"><span class="nav-icon">☎</span>Contact</button>
+    <button class="active"><span class="nav-icon">◉</span>Profile</button>
+  </nav>
+</section>
+
+
+<section id="landlordPropertiesScreen" class="screen dashboard">
+  <div class="top">
+    <div class="greeting">Your<br><span>Properties</span></div>
+    <div class="bell">🏠</div>
+  </div>
+  <div class="section">
+    <div class="section-title"><span>Property Portfolio</span><a onclick="openModal()">+ Add Property</a></div>
+    <div id="landlordPropertyDetails"></div>
+  </div>
+  <nav class="nav">
+    <button onclick="showScreen('homeScreen')"><span class="nav-icon">⌂</span>Home</button>
+    <button class="active" onclick="showScreen('landlordPropertiesScreen');renderLandlordProperties()"><span class="nav-icon">▣</span>Properties</button>
+    <button onclick="showScreen('landlordTenantsScreen');renderTenants()"><span class="nav-icon">👥</span>Contacts</button>
+    <button onclick="showScreen('landlordProfileScreen');renderLandlordProfile()"><span class="nav-icon">◉</span>Profile</button>
+  </nav>
+</section>
+
+<section id="landlordTenantsScreen" class="screen dashboard">
+  <div class="top">
+    <div class="greeting">Your<br><span>Tenants</span></div>
+    <div class="bell">👥</div>
+  </div>
+  <div class="section">
+    <div class="section-title"><span>All Tenant Contacts</span><span id="tenantCount" style="font-size:14px;color:var(--muted)"></span></div>
+    <div id="landlordTenantList"></div>
+  </div>
+  <nav class="nav">
+    <button onclick="showScreen('homeScreen')"><span class="nav-icon">⌂</span>Home</button>
+    <button onclick="showScreen('landlordPropertiesScreen');renderLandlordProperties()"><span class="nav-icon">▣</span>Properties</button>
+    <button class="active"><span class="nav-icon">👥</span>Contacts</button>
+    <button onclick="showScreen('landlordProfileScreen');renderLandlordProfile()"><span class="nav-icon">◉</span>Profile</button>
+  </nav>
+</section>
+
+<section id="landlordProfileScreen" class="screen dashboard">
+  <div class="top">
+    <div class="greeting">Landlord<br><span>Profile</span></div>
+    <div class="bell">◉</div>
+  </div>
+  <div class="section">
+    <div class="profile-box" style="border:1px solid #ddd;border-radius:18px;padding:28px;text-align:center">
+      <div style="width:86px;height:86px;border-radius:50%;background:#fff1e8;color:var(--orange);display:flex;align-items:center;justify-content:center;font-size:42px;margin:0 auto 18px">🏠</div>
+      <h2 id="landlordProfileName" style="margin:0 0 8px">Landlord</h2>
+      <p id="landlordProfileEmail" style="color:var(--muted);margin:0 0 22px">email@example.com</p>
+      <div id="landlordProfileDetails" style="text-align:left;border-top:1px solid #eee;padding-top:18px;line-height:2"></div>
+      <button class="cta" style="margin-top:20px" onclick="logout()">Log Out</button>
+    </div>
+  </div>
+  <nav class="nav">
+    <button onclick="showScreen('homeScreen')"><span class="nav-icon">⌂</span>Home</button>
+    <button onclick="showScreen('landlordPropertiesScreen');renderLandlordProperties()"><span class="nav-icon">▣</span>Properties</button>
+    <button onclick="showScreen('landlordTenantsScreen');renderTenants()"><span class="nav-icon">👥</span>Contacts</button>
+    <button class="active"><span class="nav-icon">◉</span>Profile</button>
+  </nav>
+</section>
+
+<section id="homeScreen" class="screen dashboard">
+  <div class="top">
+    <div class="greeting">Good Morning,<span id="userName">Landlord</span></div>
+    <div class="bell">♧</div>
+  </div>
+  <div class="location">📍 South Africa　⌄</div>
+  <div class="tag">🇿🇦 Manage your student accommodation across South Africa</div>
+  <div class="search">⌕ <input id="propertySearch" placeholder="Search your properties..."></div>
+  <div class="filters">
+    <button class="filter active" onclick="filterListings('all',this)">🏠<br>All Properties</button>
+    <button class="filter" onclick="filterListings('occupied',this)">👥<br>Occupied</button>
+    <button class="filter" onclick="filterListings('available',this)">🔑<br>Available</button>
+    <button class="filter" onclick="filterListings('maintenance',this)">🔧<br>Maintenance</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span>Property Overview</span><a onclick="openModal()">+ Add Property</a></div>
+    <div class="feature">
+      <div class="property-img"></div>
+      <div class="property-info">
+        <div>📍 Cape Town, Western Cape</div>
+        <h3>One Thibault Residence</h3>
+        <div class="rating">★★★★★ <span style="color:#333;font-size:14px">4.7 (128)</span></div>
+        <div class="price">R12 900/month</div>
+        <div class="small">🏠 24 rooms　👥 21 occupied</div><br>
+        <button class="cta" onclick="showToast('Opening property management')">Manage Property →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span>Your Properties</span><a onclick="openModal()">View all ›</a></div>
+    <div class="cards" id="propertyCards">
+      <div class="card" data-status="occupied"><div class="card-img"></div><div class="card-body"><h4>The Hub Braamfontein</h4><div class="price">R28 350/month</div><div class="small">21/24 rooms occupied</div></div></div>
+      <div class="card" data-status="available"><div class="card-img"></div><div class="card-body"><h4>Studios on Florida</h4><div class="price">R19 150/month</div><div class="small">8 rooms available</div></div></div>
+      <div class="card" data-status="maintenance"><div class="card-img"></div><div class="card-body"><h4>The Terrace Hatfield</h4><div class="price">R31 400/month</div><div class="small">2 units in maintenance</div></div></div>
+    </div>
+  </div>
+
+  <div class="trust"><div class="trust-icon">✓</div><div><b>Manage. Verify. Grow.</b><br><span class="small">Keep your properties and student tenants organised in one place.</span></div></div>
+
+  <nav class="nav">
+    <button class="active" onclick="showScreen('homeScreen')"><span class="nav-icon">⌂</span>Home</button>
+    <button onclick="showScreen('landlordPropertiesScreen');renderLandlordProperties()"><span class="nav-icon">▣</span>Properties</button>
+    <button onclick="showScreen('landlordTenantsScreen');renderTenants()"><span class="nav-icon">👥</span>Contacts</button>
+    <button onclick="showScreen('landlordProfileScreen');renderLandlordProfile()"><span class="nav-icon">◉</span>Profile</button>
+  </nav>
+</section>
+</div>
+
+<div class="modal" id="propertyModal">
+  <div class="modal-box">
+    <h2>Add Property</h2>
+    <input id="newPropertyName" placeholder="Property name">
+    <input id="newPropertyLocation" placeholder="City / Province">
+    <input id="newPropertyPrice" type="number" placeholder="Monthly rent (R)">
+    <div class="modal-actions">
+      <button class="secondary" onclick="closeModal()">Cancel</button>
+      <button class="cta" onclick="addProperty()">Add Property</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+let isRegistering=true;
+let selectedRole='landlord';
+const $=id=>document.getElementById(id);
+
+function chooseRole(role){
+  selectedRole=role;
+  localStorage.setItem('studentStayRole',role);
+  showScreen('authScreen');
+  $('nameInput').placeholder=role==='student'?'Name':'Landlord Account Number';
+  $('idInput').placeholder=role==='student'?'Student Number':'ID Number';
+  $('authTitle').innerHTML=role==='student'?'Student<br>Stay':'Landlord<br>Stay';
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function toggleAuth(){
+  isRegistering=!isRegistering;
+  $('authTitle').innerHTML=isRegistering?'Student<br>Stay':'Welcome<br>Back';
+  $('switchText').textContent=isRegistering?'Already registered?':"Don't have an account?";
+  $('switchLink').textContent=isRegistering?'Sign in':'Create account';
+  $('nameInput').placeholder=isRegistering?'Landlord Account Number':'Email';
+  $('idInput').placeholder=isRegistering?'ID Number':'Password';
+}
+$('authForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const email=$('emailInput').value.trim();
+  const password=$('passwordInput').value;
+  const name=$('nameInput').value.trim();
+  if(password.length<6){$('authError').textContent='Password must be at least 6 characters.';return}
+  localStorage.setItem('studentStayUser',JSON.stringify({name:name||'Landlord',email,password}));
+  $('authError').textContent='';
+  if(selectedRole==='student'){
+    $('studentUserName').textContent=name||'Student';
+    showToast('Student account created successfully!');
+    setTimeout(()=>showScreen('studentHomeScreen'),600);
+  }else{
+    $('userName').textContent=name||'Landlord';
+    showToast('Landlord account created successfully!');
+    setTimeout(()=>showScreen('homeScreen'),600);
+  }
+});
+$('loginForm').addEventListener('submit',e=>{
+  e.preventDefault();
+  const saved=JSON.parse(localStorage.getItem('studentStayUser')||'null');
+  if(!saved || saved.email!==$('loginEmail').value || saved.password!==$('loginPassword').value){
+    $('loginError').textContent='No matching account found. Create an account first.';
+    return;
+  }
+  if(selectedRole==='student'){
+    $('studentUserName').textContent=saved.name||'Student';
+    showScreen('studentHomeScreen');
+  }else{
+    $('userName').textContent=saved.name||'Landlord';
+    showScreen('homeScreen');
+  }
+});
+function showToast(msg){
+  $('toast').textContent=msg;$('toast').classList.add('show');
+  setTimeout(()=>$('toast').classList.remove('show'),2200);
+}
+function openModal(){$('propertyModal').classList.add('open')}
+function closeModal(){$('propertyModal').classList.remove('open')}
+function addProperty(){
+  const name=$('newPropertyName').value.trim();
+  const location=$('newPropertyLocation').value.trim();
+  const price=$('newPropertyPrice').value;
+  if(!name||!location||!price){showToast('Please complete all fields');return}
+  const card=document.createElement('div');
+  card.className='card';card.dataset.status='available';
+  card.innerHTML=`<div class="card-img"></div><div class="card-body"><h4>${escapeHTML(name)}</h4><div class="price">R${Number(price).toLocaleString()}/month</div><div class="small">${escapeHTML(location)} · Available</div></div>`;
+  $('propertyCards').appendChild(card);
+  closeModal();showToast('Property added successfully');
+  $('newPropertyName').value='';$('newPropertyLocation').value='';$('newPropertyPrice').value='';
+}
+function filterListings(status,button){
+  document.querySelectorAll('.filter').forEach(b=>b.classList.remove('active'));button.classList.add('active');
+  document.querySelectorAll('#propertyCards .card').forEach(card=>{
+    card.style.display=(status==='all'||card.dataset.status===status)?'block':'none';
+  });
+}
+function navAction(item){
+  if(item==='home') showScreen('homeScreen');
+  else if(item==='properties'){showScreen('landlordPropertiesScreen');renderLandlordProperties();}
+  else if(item==='search') $('propertySearch').focus();
+  else if(item==='contact'){showScreen('landlordTenantsScreen');renderTenants();}
+  else if(item==='profile'){showScreen('landlordProfileScreen');renderLandlordProfile();}
+}
+$('studentSearchInput')?.addEventListener('input',renderStudentListings);
+
+$('propertySearch').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase();
+  document.querySelectorAll('#propertyCards .card').forEach(card=>{
+    card.style.display=card.innerText.toLowerCase().includes(q)?'block':'none';
+  });
+});
+
+
+const landlordProperties = [
+  {
+    id:1,name:'One Thibault Residence',location:'Cape Town, Western Cape',
+    type:'Student Residence',rooms:24,occupied:21,monthlyIncome:27180,
+    amenities:'Fibre Wi-Fi, 24/7 Security, Laundry, Study Area',
+    tenants:[
+      {name:'Lebo Maseko',age:21,course:'BCom Accounting',phone:'072 111 2233',email:'lebo@example.com',room:'A101',rent:1290,paid:true,lastPayment:'01 July 2026'},
+      {name:'Zanele Khumalo',age:22,course:'BSc Computer Science',phone:'073 222 3344',email:'zanele@example.com',room:'A102',rent:1290,paid:true,lastPayment:'01 July 2026'},
+      {name:'Michael Naidoo',age:20,course:'BA Media Studies',phone:'074 333 4455',email:'michael@example.com',room:'A103',rent:1290,paid:false,lastPayment:'01 June 2026'},
+      {name:'Amogelang Molefe',age:23,course:'LLB Law',phone:'075 444 5566',email:'amogelang@example.com',room:'A104',rent:1290,paid:true,lastPayment:'02 July 2026'}
+    ]
+  },
+  {
+    id:2,name:'The Hub Braamfontein',location:'Johannesburg, Gauteng',
+    type:'Student Apartments',rooms:24,occupied:21,monthlyIncome:28350,
+    amenities:'Fibre Wi-Fi, Security, Parking, Communal Lounge',
+    tenants:[
+      {name:'Thando Dube',age:21,course:'BSc Engineering',phone:'076 555 6677',email:'thando@example.com',room:'B201',rent:1350,paid:true,lastPayment:'01 July 2026'},
+      {name:'Naledi Radebe',age:20,course:'BA Psychology',phone:'077 666 7788',email:'naledi@example.com',room:'B202',rent:1350,paid:false,lastPayment:'01 June 2026'},
+      {name:'Ethan Williams',age:22,course:'BCom Finance',phone:'078 777 8899',email:'ethan@example.com',room:'B203',rent:1350,paid:true,lastPayment:'01 July 2026'}
+    ]
+  },
+  {
+    id:3,name:'Studios on Florida',location:'Durban, KwaZulu-Natal',
+    type:'Studio Apartments',rooms:18,occupied:10,monthlyIncome:11500,
+    amenities:'Fibre Wi-Fi, CCTV, Secure Access',
+    tenants:[
+      {name:'Siyabonga Zulu',age:22,course:'BCom Marketing',phone:'079 888 9900',email:'siyabonga@example.com',room:'C301',rent:1150,paid:true,lastPayment:'01 July 2026'},
+      {name:'Anele Mthembu',age:21,course:'BSc Biology',phone:'081 111 2233',email:'anele@example.com',room:'C302',rent:1150,paid:true,lastPayment:'01 July 2026'}
+    ]
+  }
+];
+
+function renderLandlordProperties(){
+  const container=$('landlordPropertyDetails');
+  container.innerHTML=landlordProperties.map(p=>`
+    <div style="border:1px solid #ddd;border-radius:18px;padding:20px;margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+        <div>
+          <h2 style="margin:0 0 8px">${escapeHTML(p.name)}</h2>
+          <div class="small">📍 ${escapeHTML(p.location)}</div>
+        </div>
+        <span style="background:#eef9fa;color:var(--teal-dark);padding:7px 10px;border-radius:8px;font-size:12px">${escapeHTML(p.type)}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0">
+        <div style="background:#f7f7f7;padding:12px;border-radius:10px"><b>${p.rooms}</b><br><span class="small">Total Rooms</span></div>
+        <div style="background:#f7f7f7;padding:12px;border-radius:10px"><b>${p.occupied}</b><br><span class="small">Occupied</span></div>
+        <div style="background:#f7f7f7;padding:12px;border-radius:10px"><b>R${p.monthlyIncome.toLocaleString()}</b><br><span class="small">Monthly Income</span></div>
+      </div>
+      <div style="line-height:1.8"><b>Amenities:</b> ${escapeHTML(p.amenities)}</div>
+      <h3 style="margin:22px 0 12px">Tenants in this property</h3>
+      ${p.tenants.map(t=>tenantRow(t,p.name)).join('')}
+    </div>`).join('');
+}
+
+function tenantRow(t,propertyName){
+  return `<div style="border:1px solid #eee;border-radius:12px;padding:14px;margin-bottom:10px">
+    <div style="display:flex;justify-content:space-between;gap:10px">
+      <div><b>${escapeHTML(t.name)}</b><br><span class="small">Room ${escapeHTML(t.room)} · ${t.age} years old</span></div>
+      <span style="font-size:12px;padding:6px 8px;border-radius:8px;background:${t.paid?'#e8f7ef':'#fff0ed'};color:${t.paid?'#167044':'#c7462b'}">${t.paid?'✓ Paid':'⚠ Outstanding'}</span>
+    </div>
+    <div class="small" style="margin-top:8px">🎓 ${escapeHTML(t.course)}<br>☎ ${escapeHTML(t.phone)}<br>✉ ${escapeHTML(t.email)}<br>💳 R${t.rent.toLocaleString()}/month · Last payment: ${escapeHTML(t.lastPayment)}</div>
+  </div>`;
+}
+
+function renderTenants(){
+  const all=[];
+  landlordProperties.forEach(p=>p.tenants.forEach(t=>all.push({...t,property:p.name})));
+  $('tenantCount').textContent=`${all.length} tenants`;
+  $('landlordTenantList').innerHTML=all.map(t=>`
+    <div style="border:1px solid #ddd;border-radius:16px;padding:18px;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;gap:10px">
+        <div><h3 style="margin:0 0 6px">${escapeHTML(t.name)}</h3><div class="small">${escapeHTML(t.property)} · Room ${escapeHTML(t.room)}</div></div>
+        <span style="font-size:12px;padding:6px 8px;border-radius:8px;background:${t.paid?'#e8f7ef':'#fff0ed'};color:${t.paid?'#167044':'#c7462b'}">${t.paid?'✓ Payment Confirmed':'⚠ Payment Due'}</span>
+      </div>
+      <div style="margin-top:12px;line-height:1.8">
+        <b>Age:</b> ${t.age}<br>
+        <b>Course:</b> ${escapeHTML(t.course)}<br>
+        <b>Phone:</b> ${escapeHTML(t.phone)}<br>
+        <b>Email:</b> ${escapeHTML(t.email)}<br>
+        <b>Rent:</b> R${t.rent.toLocaleString()}/month<br>
+        <b>Last Payment:</b> ${escapeHTML(t.lastPayment)}
+      </div>
+    </div>`).join('');
+}
+
+function renderLandlordProfile(){
+  const saved=JSON.parse(localStorage.getItem('studentStayUser')||'null');
+  const totalTenants=landlordProperties.reduce((sum,p)=>sum+p.tenants.length,0);
+  const totalRooms=landlordProperties.reduce((sum,p)=>sum+p.rooms,0);
+  $('landlordProfileName').textContent=saved?.name||'Landlord';
+  $('landlordProfileEmail').textContent=saved?.email||'email@example.com';
+  $('landlordProfileDetails').innerHTML=`
+    <b>Account Type:</b> Property Landlord<br>
+    <b>Location:</b> South Africa<br>
+    <b>Properties:</b> ${landlordProperties.length}<br>
+    <b>Total Rooms:</b> ${totalRooms}<br>
+    <b>Active Tenants:</b> ${totalTenants}<br>
+    <b>Account Status:</b> <span style="color:#167044;font-weight:700">Verified</span>`;
+}
+
+const accommodations = [
+  {id:1,name:'One Thibault Residence',city:'Cape Town, Western Cape',price:1290,university:'UCT',status:'Available',landlord:'Thabo Mokoena',phone:'071 234 5678',email:'thabo@onethibault.co.za'},
+  {id:2,name:'The Hub Braamfontein',city:'Johannesburg, Gauteng',price:1350,university:'Wits University',status:'Available',landlord:'Naledi Dlamini',phone:'072 456 7890',email:'naledi@thehub.co.za'},
+  {id:3,name:'Studios on Florida',city:'Durban, KwaZulu-Natal',price:1150,university:'UKZN Howard',status:'Available',landlord:'Sibusiso Ndlovu',phone:'073 111 2233',email:'sibusiso@studiosflorida.co.za'},
+  {id:4,name:'The Terrace Hatfield',city:'Pretoria, Gauteng',price:1400,university:'UP Hatfield',status:'Available',landlord:'Kagiso Molefe',phone:'074 222 3344',email:'kagiso@terracehatfield.co.za'},
+  {id:5,name:'Campus Edge Mowbray',city:'Cape Town, Western Cape',price:980,university:'UCT',status:'Available',landlord:'Ayesha Daniels',phone:'076 555 6677',email:'ayesha@campusedge.co.za'},
+  {id:6,name:'Park House Student Living',city:'Johannesburg, Gauteng',price:1200,university:'UJ',status:'Available',landlord:'Lerato Nkosi',phone:'078 888 9900',email:'lerato@parkhouse.co.za'},
+  {id:7,name:'Varsity Village',city:'Bloemfontein, Free State',price:850,university:'UFS',status:'Available',landlord:'Pieter Jacobs',phone:'079 333 4455',email:'pieter@varsityvillage.co.za'},
+  {id:8,name:'The Nest Stellenbosch',city:'Stellenbosch, Western Cape',price:1600,university:'Stellenbosch University',status:'Available',landlord:'Mia van der Merwe',phone:'082 666 7788',email:'mia@thenest.co.za'}
+];
+
+let savedAccommodationIds = JSON.parse(localStorage.getItem('savedAccommodationIds') || '[]');
+
+function accommodationCard(a){
+  const saved=savedAccommodationIds.includes(a.id);
+  return `<div class="card" style="min-width:250px">
+    <div class="card-img"></div>
+    <div class="card-body">
+      <div style="display:flex;justify-content:space-between;gap:8px">
+        <h4>${escapeHTML(a.name)}</h4>
+        <button onclick="toggleSaved(${a.id})" style="border:0;background:none;font-size:24px;cursor:pointer">${saved?'♥':'♡'}</button>
+      </div>
+      <div class="small">📍 ${escapeHTML(a.city)}</div>
+      <div class="price">R${a.price.toLocaleString()}/month</div>
+      <div class="small">🎓 Near ${escapeHTML(a.university)}</div>
+      <button class="cta" style="margin-top:12px;width:100%" onclick="contactLandlord(${a.id})">Contact Landlord</button>
+    </div>
+  </div>`;
+}
+
+function renderStudentListings(){
+  const q=($('studentSearchInput')?.value||'').toLowerCase();
+  const results=accommodations.filter(a=>
+    `${a.name} ${a.city} ${a.university}`.toLowerCase().includes(q)
+  );
+  $('studentAccommodationList').innerHTML=results.map(accommodationCard).join('');
+  $('studentResultCount').textContent=`${results.length} found`;
+}
+
+function toggleSaved(id){
+  if(savedAccommodationIds.includes(id)){
+    savedAccommodationIds=savedAccommodationIds.filter(x=>x!==id);
+    showToast('Removed from favourites');
+  }else{
+    savedAccommodationIds.push(id);
+    showToast('Saved to favourites');
+  }
+  localStorage.setItem('savedAccommodationIds',JSON.stringify(savedAccommodationIds));
+  renderStudentListings();
+  renderSaved();
+  renderProfile();
+}
+
+function renderSaved(){
+  const list=$('savedAccommodationList');
+  const saved=accommodations.filter(a=>savedAccommodationIds.includes(a.id));
+  list.innerHTML=saved.map(accommodationCard).join('');
+  $('emptySaved').style.display=saved.length?'none':'block';
+}
+
+function renderLandlords(){
+  $('landlordList').innerHTML=accommodations.map(a=>`
+    <div style="border:1px solid #ddd;border-radius:16px;padding:18px;margin-bottom:14px">
+      <h3 style="margin:0 0 8px">${escapeHTML(a.landlord)}</h3>
+      <div style="font-weight:700">${escapeHTML(a.name)}</div>
+      <div class="small">📍 ${escapeHTML(a.city)}</div>
+      <div style="margin-top:10px">☎ ${escapeHTML(a.phone)}<br>✉ ${escapeHTML(a.email)}</div>
+      <button class="cta" style="margin-top:12px" onclick="showToast('Contact details copied')">Contact</button>
+    </div>`).join('');
+}
+
+function contactLandlord(id){
+  const a=accommodations.find(x=>x.id===id);
+  showToast(`Landlord: ${a.landlord} · ${a.phone}`);
+}
+
+function renderProfile(){
+  const saved=JSON.parse(localStorage.getItem('studentStayUser')||'null');
+  $('profileName').textContent=saved?.name||'Student';
+  $('profileEmail').textContent=saved?.email||'email@example.com';
+  $('profileSavedCount').textContent=savedAccommodationIds.length;
+}
+
+function logout(){
+  showScreen('roleScreen');
+  showToast('You have been logged out');
+}
+
+function escapeHTML(str){return str.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+</script>
+</body>
+</html>
