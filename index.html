@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Student Stay</title>
-<link rel="icon" type="image/png" href="160580 (1).png">
+<title>Student Stay </title>
 <style>
 :root{
   --orange:#ff914d;
@@ -35,6 +34,14 @@ button{cursor:pointer}
 }
 .screen{display:none;min-height:100vh}
 .screen.active{display:block}
+
+
+.field.valid{border-color:#16834b;background:#f4fff8}
+.field.invalid{border-color:#c62828;background:#fff7f6}
+.validation-message{font-size:13px;margin-top:-12px;margin-bottom:10px;min-height:16px;color:#c62828}
+.validation-message.success{color:#16834b}
+.password-strength{font-size:13px;margin-top:-10px;margin-bottom:10px;font-weight:700}
+.form-submit:disabled{opacity:.5;cursor:not-allowed;transform:none}
 
 .role-screen{min-height:100vh;padding:48px 34px;display:flex;align-items:center;justify-content:center}
 .role-wrap{width:min(100%,760px);text-align:center}
@@ -169,6 +176,11 @@ button{cursor:pointer}
   .feature{grid-template-columns:1fr}
   .property-img{min-height:220px}
 }
+
+.field-error{border-color:#d93025!important;box-shadow:0 0 0 3px rgba(217,48,37,.08)}
+.error-message{display:none;color:#d93025;font-size:12px;margin:-12px 0 12px 4px;line-height:1.35}
+.error-message.show{display:block}
+
 </style>
 </head>
 <body>
@@ -181,13 +193,13 @@ button{cursor:pointer}
       <div class="subtitle">How would you like to use Student Stay?</div>
       <div class="role-options">
         <div class="role-card">
-          <div class="role-icon"></div>
+          <div class="role-icon">🎓</div>
           <h2>Student</h2>
           <p>Find verified student accommodation and discover a place to stay across South Africa.</p>
           <button class="role-button" onclick="chooseRole('student')">Continue as Student →</button>
         </div>
         <div class="role-card">
-          <div class="role-icon"></div>
+          <div class="role-icon">🏠</div>
           <h2>Landlord</h2>
           <p>List and manage your student accommodation, tenants, and properties in one place.</p>
           <button class="role-button" onclick="chooseRole('landlord')">Continue as Landlord →</button>
@@ -204,10 +216,15 @@ button{cursor:pointer}
     <div class="switch"><span id="switchText">Already registered?</span> <a id="switchLink" onclick="toggleAuth()">Sign in</a></div>
     <div class="hero-img"></div>
     <form id="authForm">
-      <div class="field"><span class="icon"></span><input id="nameInput" placeholder="Landlord Account Number" required></div>
-      <div class="field"><span class="icon"></span><input id="emailInput" type="email" placeholder="Email" required></div>
-      <div class="field"><span class="icon"></span><input id="passwordInput" type="password" placeholder="Password" minlength="6" required></div>
-      <div class="field"><span class="icon"></span><input id="idInput" placeholder="ID Number" required></div>
+      <div class="field" id="nameField"><span class="icon">♙</span><input id="nameInput" placeholder="Landlord Account Number" maxlength="60" required></div>
+      <div class="validation-message" id="nameValidation"></div>
+      <div class="field" id="emailField"><span class="icon">✉</span><input id="emailInput" type="email" placeholder="Email" maxlength="120" required></div>
+      <div class="validation-message" id="emailValidation"></div>
+      <div class="field" id="passwordField"><span class="icon">♙</span><input id="passwordInput" type="password" placeholder="Password" minlength="8" maxlength="64" required></div>
+      <div class="password-strength" id="passwordStrength"></div>
+      <div class="validation-message" id="passwordValidation"></div>
+      <div class="field" id="idField"><span class="icon">▦</span><input id="idInput" placeholder="ID Number" inputmode="numeric" maxlength="13" required></div>
+      <div class="validation-message" id="idValidation"></div>
       <div class="error" id="authError"></div>
       <button class="primary" type="submit">→</button>
     </form>
@@ -221,8 +238,10 @@ button{cursor:pointer}
     <div class="switch">Don't have an account? <a onclick="showScreen('roleScreen')">Create account</a></div>
     <div class="hero-img"></div>
     <form id="loginForm">
-      <div class="field"><span class="icon"></span><input id="loginEmail" type="email" placeholder="Email" required></div>
-      <div class="field"><span class="icon"></span><input id="loginPassword" type="password" placeholder="Password" required></div>
+      <div class="field" id="loginEmailField"><span class="icon">✉</span><input id="loginEmail" type="email" placeholder="Email" required></div>
+      <div class="validation-message" id="loginEmailValidation"></div>
+      <div class="field" id="loginPasswordField"><span class="icon">♙</span><input id="loginPassword" type="password" placeholder="Password" required></div>
+      <div class="validation-message" id="loginPasswordValidation"></div>
       <div class="error" id="loginError"></div>
       <button class="primary" type="submit">→</button>
     </form>
@@ -231,10 +250,10 @@ button{cursor:pointer}
 
 <section id="studentHomeScreen" class="screen dashboard">
   <div class="top">
-    <div class="greeting">Good Morning,<span id="studentUserName">Student</span> </div>
-    <div class="bell"></div>
+    <div class="greeting">Good Morning,<span id="studentUserName">Student</span> 👋</div>
+    <div class="bell">♧</div>
   </div>
-  <div class="location"> South Africa　⌄</div>
+  <div class="location">📍 South Africa　⌄</div>
   <div class="tag">🇿🇦 Find verified student accommodation across South Africa</div>
   <div class="search">⌕ <input placeholder="Search by university, city or suburb..."></div>
   <div class="section">
@@ -242,7 +261,7 @@ button{cursor:pointer}
     <div class="feature">
       <div class="property-img"></div>
       <div class="property-info">
-        <div> Cape Town, Western Cape</div>
+        <div>📍 Cape Town, Western Cape</div>
         <h3>One Thibault Residence</h3>
         <div class="rating">★★★★★ <span style="color:#333;font-size:14px">4.7 (128)</span></div>
         <div class="price">R1 290/month</div>
@@ -275,7 +294,7 @@ button{cursor:pointer}
     <button onclick="showScreen('studentHomeScreen')"><span class="nav-icon">⌂</span>Home</button>
     <button onclick="showScreen('studentSavedScreen');renderSaved()"><span class="nav-icon">♡</span>Saved</button>
     <button class="active"><span class="nav-icon">⌕</span>Search</button>
-    <button onclick="showScreen('studentContactScreen')"><span class="nav-icon"></span>Contact</button>
+    <button onclick="showScreen('studentContactScreen')"><span class="nav-icon">☎</span>Contact</button>
     <button onclick="showScreen('studentProfileScreen');renderProfile()"><span class="nav-icon">◉</span>Profile</button>
   </nav>
 </section>
@@ -473,17 +492,170 @@ let isRegistering=true;
 let selectedRole='landlord';
 const $=id=>document.getElementById(id);
 
+
+function setFieldError(inputId,errorId,message){
+  const input=$(inputId), error=$(errorId);
+  if(!input || !error) return;
+  input.classList.add('field-error');
+  error.textContent=message;
+  error.classList.add('show');
+}
+function clearFieldError(inputId,errorId){
+  const input=$(inputId), error=$(errorId);
+  if(!input || !error) return;
+  input.classList.remove('field-error');
+  error.textContent='';
+  error.classList.remove('show');
+}
+function clearAllAuthErrors(){
+  [['nameInput','nameError'],['emailInput','emailError'],['passwordInput','passwordError'],['idInput','idError']]
+    .forEach(([i,e])=>clearFieldError(i,e));
+}
+function validateAuthForm(){
+  clearAllAuthErrors();
+  let valid=true;
+  const name=$('nameInput').value.trim();
+  const email=$('emailInput').value.trim();
+  const password=$('passwordInput').value;
+  const id=$('idInput').value.trim();
+
+  if(!name){
+    setFieldError('nameInput','nameError',selectedRole==='student'?'Please enter your name.':'Please enter your landlord account number.');
+    valid=false;
+  }else if(selectedRole==='landlord' && !/^[A-Za-z0-9-]{4,30}$/.test(name)){
+    setFieldError('nameInput','nameError','Landlord account number may only contain letters, numbers, or hyphens.');
+    valid=false;
+  }
+
+  if(!email){
+    setFieldError('emailInput','emailError','Please enter your email address.');
+    valid=false;
+  }else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    setFieldError('emailInput','emailError','Please enter a valid email address.');
+    valid=false;
+  }
+
+  if(!password){
+    setFieldError('passwordInput','passwordError','Please enter a password.');
+    valid=false;
+  }else if(password.length<8){
+    setFieldError('passwordInput','passwordError','Password must be at least 8 characters.');
+    valid=false;
+  }
+
+  if(!id){
+    setFieldError('idInput','idError',selectedRole==='student'?'Please enter your student number.':'Please enter your South African ID number.');
+    valid=false;
+  }else if(selectedRole==='landlord' && !/^\d{13}$/.test(id)){
+    setFieldError('idInput','idError','South African ID numbers must contain exactly 13 digits.');
+    valid=false;
+  }else if(selectedRole==='student' && !/^\d{6,13}$/.test(id)){
+    setFieldError('idInput','idError','Student numbers must contain between 6 and 13 digits.');
+    valid=false;
+  }
+  return valid;
+}
+function numericOnly(input){
+  if(!input) return;
+  input.addEventListener('input',()=>{
+    input.value=input.value.replace(/\D/g,'').slice(0,input.maxLength||999);
+  });
+}
+
+
+function isValidEmail(email){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+}
+function isValidName(name){
+  return /^[A-Za-zÀ-ÿ' -]{2,60}$/.test(name);
+}
+function passwordScore(password){
+  let score=0;
+  if(password.length>=8) score++;
+  if(/[A-Z]/.test(password)) score++;
+  if(/[a-z]/.test(password)) score++;
+  if(/[0-9]/.test(password)) score++;
+  if(/[^A-Za-z0-9]/.test(password)) score++;
+  return score;
+}
+function validPassword(password){
+  return passwordScore(password)===5;
+}
+function setValidation(inputId,messageId,message,isValid){
+  const input=$(inputId), msg=$(messageId);
+  if(!input||!msg) return;
+  const field=input.closest('.field');
+  field.classList.toggle('valid',isValid);
+  field.classList.toggle('invalid',!isValid);
+  msg.textContent=message||'';
+  msg.classList.toggle('success',isValid);
+}
+function validateRegistration(name,email,password,id){
+  let ok=true;
+  if(!name){
+    setValidation('nameInput','nameValidation','Name is required.',false); ok=false;
+  }else if(!isValidName(name)){
+    setValidation('nameInput','nameValidation','Please enter a valid name using letters, spaces, apostrophes or hyphens only.',false); ok=false;
+  }else setValidation('nameInput','nameValidation','✓ Valid name',true);
+
+  if(!email){
+    setValidation('emailInput','emailValidation','Email is required.',false); ok=false;
+  }else if(!isValidEmail(email)){
+    setValidation('emailInput','emailValidation','Please enter a valid email address.',false); ok=false;
+  }else setValidation('emailInput','emailValidation','✓ Valid email',true);
+
+  if(!password){
+    setValidation('passwordInput','passwordValidation','Password is required.',false); ok=false;
+  }else if(!validPassword(password)){
+    setValidation('passwordInput','passwordValidation','Password must contain 8+ characters, uppercase, lowercase, number and special character.',false); ok=false;
+  }else setValidation('passwordInput','passwordValidation','✓ Strong password',true);
+
+  if(selectedRole==='student'){
+    if(!/^\d{8,10}$/.test(id)){
+      setValidation('idInput','idValidation','Student number must contain 8 to 10 numbers only.',false); ok=false;
+    }else setValidation('idInput','idValidation','✓ Valid student number',true);
+  }else{
+    if(!/^\d{13}$/.test(id)){
+      setValidation('idInput','idValidation','South African ID number must contain exactly 13 numbers.',false); ok=false;
+    }else setValidation('idInput','idValidation','✓ Valid 13-digit ID number',true);
+  }
+  return ok;
+}
+function setupInputValidation(){
+  const name=$('nameInput'),email=$('emailInput'),password=$('passwordInput'),id=$('idInput');
+  name.addEventListener('input',()=>{name.value=name.value.replace(/[^A-Za-zÀ-ÿ' -]/g,'').slice(0,60)});
+  email.addEventListener('input',()=>{if(email.value && !isValidEmail(email.value)) setValidation('emailInput','emailValidation','Please enter a valid email address.',false)});
+  password.addEventListener('input',()=>{
+    const score=passwordScore(password.value);
+    const labels=['','Weak','Weak','Medium','Strong','Very Strong'];
+    $('passwordStrength').textContent=password.value?`Password strength: ${labels[score]}`:'';
+    $('passwordStrength').style.color=score>=4?'#16834b':score>=3?'#b56b00':'#c62828';
+  });
+  id.addEventListener('input',()=>{id.value=id.value.replace(/\D/g,'').slice(0,13)});
+}
+
 function chooseRole(role){
   selectedRole=role;
   localStorage.setItem('studentStayRole',role);
   showScreen('authScreen');
+  $('authForm').reset();
+  document.querySelectorAll('#authForm .field').forEach(f=>f.classList.remove('valid','invalid'));
+  document.querySelectorAll('#authForm .validation-message').forEach(m=>m.textContent='');
+  $('passwordStrength').textContent='';
   $('nameInput').placeholder=role==='student'?'Name':'Landlord Account Number';
   $('idInput').placeholder=role==='student'?'Student Number':'ID Number';
   $('authTitle').innerHTML=role==='student'?'Student<br>Stay':'Landlord<br>Stay';
 }
 
 function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  
+numericOnly($('idInput'));
+['nameInput','emailInput','passwordInput','idInput'].forEach(id=>{
+  $(id)?.addEventListener('input',()=>clearAllAuthErrors());
+});
+
+
+document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $(id).classList.add('active');
   window.scrollTo(0,0);
 }
@@ -497,11 +669,22 @@ function toggleAuth(){
 }
 $('authForm').addEventListener('submit',e=>{
   e.preventDefault();
-  const email=$('emailInput').value.trim();
-  const password=$('passwordInput').value;
   const name=$('nameInput').value.trim();
-  if(password.length<6){$('authError').textContent='Password must be at least 6 characters.';return}
-  localStorage.setItem('studentStayUser',JSON.stringify({name:name||'Landlord',email,password}));
+  const email=$('emailInput').value.trim().toLowerCase();
+  const password=$('passwordInput').value;
+  const id=$('idInput').value.trim();
+  const valid = validateRegistration(name,email,password,id);
+  if(!valid) return;
+
+  const existing=JSON.parse(localStorage.getItem('studentStayUser')||'null');
+  if(existing && existing.email===email){
+    setValidation('emailInput','emailValidation','An account with this email already exists.',false);
+    return;
+  }
+
+  localStorage.setItem('studentStayUser',JSON.stringify({
+    name,email,password,id,role:selectedRole
+  }));
   $('authError').textContent='';
   if(selectedRole==='student'){
     $('studentUserName').textContent=name||'Student';
@@ -515,9 +698,32 @@ $('authForm').addEventListener('submit',e=>{
 });
 $('loginForm').addEventListener('submit',e=>{
   e.preventDefault();
+  const email=$('loginEmail').value.trim().toLowerCase();
+  const password=$('loginPassword').value;
+  $('loginError').textContent='';
+  if(!isValidEmail(email)){
+    setValidation('loginEmail','loginEmailValidation','Please enter a valid email address.',false);
+    return;
+  }
+  if(!password){
+    setValidation('loginPassword','loginPasswordValidation','Password is required.',false);
+    return;
+  }
   const saved=JSON.parse(localStorage.getItem('studentStayUser')||'null');
-  if(!saved || saved.email!==$('loginEmail').value || saved.password!==$('loginPassword').value){
-    $('loginError').textContent='No matching account found. Create an account first.';
+  if(!saved){
+    $('loginError').textContent='No account exists yet. Please create an account first.';
+    return;
+  }
+  if(saved.email!==email){
+    setValidation('loginEmail','loginEmailValidation','No account exists with this email.',false);
+    return;
+  }
+  if(saved.password!==password){
+    setValidation('loginPassword','loginPasswordValidation','Incorrect password.',false);
+    return;
+  }
+  if(saved.role && saved.role!==selectedRole){
+    $('loginError').textContent=`This account is registered as a ${saved.role}, not a ${selectedRole}.`;
     return;
   }
   if(selectedRole==='student'){
@@ -537,11 +743,13 @@ function closeModal(){$('propertyModal').classList.remove('open')}
 function addProperty(){
   const name=$('newPropertyName').value.trim();
   const location=$('newPropertyLocation').value.trim();
-  const price=$('newPropertyPrice').value;
-  if(!name||!location||!price){showToast('Please complete all fields');return}
+  const price=Number($('newPropertyPrice').value);
+  if(name.length<3){showToast('Property name must be at least 3 characters');return}
+  if(!location){showToast('Property location is required');return}
+  if(!Number.isFinite(price)||price<=0){showToast('Monthly rent must be greater than R0');return}
   const card=document.createElement('div');
   card.className='card';card.dataset.status='available';
-  card.innerHTML=`<div class="card-img"></div><div class="card-body"><h4>${escapeHTML(name)}</h4><div class="price">R${Number(price).toLocaleString()}/month</div><div class="small">${escapeHTML(location)} · Available</div></div>`;
+  card.innerHTML=`<div class="card-img"></div><div class="card-body"><h4>${escapeHTML(name.slice(0,50))}</h4><div class="price">R${price.toLocaleString()}/month</div><div class="small">${escapeHTML(location)} · Available</div></div>`;
   $('propertyCards').appendChild(card);
   closeModal();showToast('Property added successfully');
   $('newPropertyName').value='';$('newPropertyLocation').value='';$('newPropertyPrice').value='';
@@ -559,6 +767,7 @@ function navAction(item){
   else if(item==='contact'){showScreen('landlordTenantsScreen');renderTenants();}
   else if(item==='profile'){showScreen('landlordProfileScreen');renderLandlordProfile();}
 }
+setupInputValidation();
 $('studentSearchInput')?.addEventListener('input',renderStudentListings);
 
 $('propertySearch').addEventListener('input',e=>{
