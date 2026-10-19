@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Student Stay - South Africa</title>
+<link rel="icon" type="image/png" href="favicon.png">
 <style>
 :root{
   --orange:#ff914d;
@@ -177,9 +178,6 @@ button{cursor:pointer}
   .property-img{min-height:220px}
 }
 
-.field-error{border-color:#d93025!important;box-shadow:0 0 0 3px rgba(217,48,37,.08)}
-.error-message{display:none;color:#d93025;font-size:12px;margin:-12px 0 12px 4px;line-height:1.35}
-.error-message.show{display:block}
 
 
 .detail-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
@@ -223,7 +221,7 @@ button{cursor:pointer}
   <div class="auth">
     <button class="close" onclick="showScreen('roleScreen')" aria-label="Close">×</button>
     <h1 id="authTitle">Student<br>Stay</h1>
-    <div class="switch"><span id="switchText">Already registered?</span> <a id="switchLink" onclick="toggleAuth()">Sign in</a></div>
+    <div class="switch"><span id="switchText">Already registered?</span> <a id="switchLink" onclick="showScreen('loginScreen')">Sign in</a></div>
     <div class="hero-img"></div>
     <form id="authForm">
       <div class="field" id="nameField"><span class="icon"></span><input id="nameInput" placeholder="Landlord Account Number" maxlength="60" required></div>
@@ -274,7 +272,7 @@ button{cursor:pointer}
         <div> Cape Town, Western Cape</div>
         <h3>One Thibault Residence</h3>
         <div class="rating">★★★★★ <span style="color:#333;font-size:14px">4.7 (128)</span></div>
-        <div class="price">R1 290/month</div>
+        <div class="price">R3 500/room/month</div>
         <button class="cta" onclick="showAccommodationDetails(1)">View details and payment options →</button>
       </div>
     </div>
@@ -298,11 +296,12 @@ button{cursor:pointer}
     <div class="info-banner"><b>Student Stay payment demo.</b> This prototype records a sample payment notification only. It does not charge a card or transfer money. A live site should use a secure payment provider and confirm payment from the provider before marking rent as paid.</div>
     <form id="paymentForm" onsubmit="submitDemoPayment(event)" style="border:1px solid #ddd;border-radius:16px;padding:20px">
       <label for="paymentProperty"><b>Accommodation</b></label>
-      <select id="paymentProperty" class="wide-field" required></select>
+      <select id="paymentProperty" class="wide-field" required onchange="updatePaymentAmount()"></select>
       <label for="paymentMonth"><b>Rental month</b></label>
       <input id="paymentMonth" class="wide-field" type="month" required>
-      <label for="paymentAmount"><b>Amount (ZAR)</b></label>
+      <label for="paymentAmount"><b>Amount incl. VAT (ZAR)</b></label>
       <input id="paymentAmount" class="wide-field" type="number" min="1" step="0.01" required>
+      <div id="paymentBreakdown" class="small" style="margin:-6px 0 12px"></div>
       <label for="paymentMethod"><b>Payment method</b></label>
       <select id="paymentMethod" class="wide-field" required onchange="toggleCardEntry()"><option value="">Choose a method</option><option value="card-entry">Card details (entry only — payment inactive)</option><option value="eft-demo">EFT (demo record only)</option></select>
       <div id="cardEntryFields" style="display:none;border:1px solid #ddd;border-radius:12px;padding:16px;margin:8px 0 14px">
@@ -493,7 +492,7 @@ button{cursor:pointer}
         <div>📍 Cape Town, Western Cape</div>
         <h3>One Thibault Residence</h3>
         <div class="rating">★★★★★ <span style="color:#333;font-size:14px">4.7 (128)</span></div>
-        <div class="price">R12 900/month</div>
+        <div class="price">R3 500/room/month</div>
         <div class="small">🏠 24 rooms　👥 21 occupied</div><br>
         <button class="cta" onclick="showToast('Opening property management')">Manage Property →</button>
       </div>
@@ -503,9 +502,9 @@ button{cursor:pointer}
   <div class="section">
     <div class="section-title"><span>Your Properties</span><a onclick="openModal()">View all ›</a></div>
     <div class="cards" id="propertyCards">
-      <div class="card" data-status="occupied"><div class="card-img"></div><div class="card-body"><h4>The Hub Braamfontein</h4><div class="price">R28 350/month</div><div class="small">21/24 rooms occupied</div></div></div>
-      <div class="card" data-status="available"><div class="card-img"></div><div class="card-body"><h4>Studios on Florida</h4><div class="price">R19 150/month</div><div class="small">8 rooms available</div></div></div>
-      <div class="card" data-status="maintenance"><div class="card-img"></div><div class="card-body"><h4>The Terrace Hatfield</h4><div class="price">R31 400/month</div><div class="small">2 units in maintenance</div></div></div>
+      <div class="card" data-status="occupied"><div class="card-img"></div><div class="card-body"><h4>The Hub Braamfontein</h4><div class="price">R3 500/room/month</div><div class="small">21/24 rooms occupied</div></div></div>
+      <div class="card" data-status="available"><div class="card-img"></div><div class="card-body"><h4>Studios on Florida</h4><div class="price">R4 500/room/month</div><div class="small">8 rooms available</div></div></div>
+      <div class="card" data-status="maintenance"><div class="card-img"></div><div class="card-body"><h4>The Terrace Hatfield</h4><div class="price">R4 500/room/month</div><div class="small">2 units in maintenance</div></div></div>
     </div>
   </div>
 
@@ -527,7 +526,7 @@ button{cursor:pointer}
     <label for="newPropertyLocation">City, suburb and province</label><input id="newPropertyLocation" placeholder="e.g. Hatfield, Pretoria, Gauteng" maxlength="120">
     <label for="newPropertyUniversity">Nearby university</label><input id="newPropertyUniversity" placeholder="University or campus" maxlength="100">
     <label for="newPropertyType">Accommodation type</label><select id="newPropertyType"><option>Student residence</option><option>Shared house</option><option>Apartment</option><option>Studio</option><option>Homestay</option></select>
-    <label for="newPropertyPrice">Monthly rent per student (R)</label><input id="newPropertyPrice" type="number" min="1" step="0.01" placeholder="Monthly rent (R)">
+    <label for="newPropertyPrice">Monthly rent per room (R, excl. VAT)</label><input id="newPropertyPrice" type="number" min="1" step="0.01" placeholder="Monthly rent (R)">
     <label for="newPropertyDeposit">Deposit (R)</label><input id="newPropertyDeposit" type="number" min="0" step="0.01" placeholder="Deposit amount">
     <label for="newPropertyRooms">Available rooms</label><input id="newPropertyRooms" type="number" min="0" step="1" placeholder="Number of rooms available">
     <label for="newPropertyRoomType">Room type</label><input id="newPropertyRoomType" placeholder="Private room, shared room, studio..." maxlength="80">
@@ -555,86 +554,18 @@ button{cursor:pointer}
 <div class="toast" id="toast"></div>
 
 <script>
-let isRegistering=true;
 let selectedRole='landlord';
 const $=id=>document.getElementById(id);
-
-
-function setFieldError(inputId,errorId,message){
-  const input=$(inputId), error=$(errorId);
-  if(!input || !error) return;
-  input.classList.add('field-error');
-  error.textContent=message;
-  error.classList.add('show');
+async function sha256(text){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-function clearFieldError(inputId,errorId){
-  const input=$(inputId), error=$(errorId);
-  if(!input || !error) return;
-  input.classList.remove('field-error');
-  error.textContent='';
-  error.classList.remove('show');
-}
-function clearAllAuthErrors(){
-  [['nameInput','nameError'],['emailInput','emailError'],['passwordInput','passwordError'],['idInput','idError']]
-    .forEach(([i,e])=>clearFieldError(i,e));
-}
-function validateAuthForm(){
-  clearAllAuthErrors();
-  let valid=true;
-  const name=$('nameInput').value.trim();
-  const email=$('emailInput').value.trim();
-  const password=$('passwordInput').value;
-  const id=$('idInput').value.trim();
-
-  if(!name){
-    setFieldError('nameInput','nameError',selectedRole==='student'?'Please enter your name.':'Please enter your landlord account number.');
-    valid=false;
-  }else if(selectedRole==='landlord' && !/^[A-Za-z0-9-]{4,30}$/.test(name)){
-    setFieldError('nameInput','nameError','Landlord account number may only contain letters, numbers, or hyphens.');
-    valid=false;
-  }
-
-  if(!email){
-    setFieldError('emailInput','emailError','Please enter your email address.');
-    valid=false;
-  }else if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-    setFieldError('emailInput','emailError','Please enter a valid email address.');
-    valid=false;
-  }
-
-  if(!password){
-    setFieldError('passwordInput','passwordError','Please enter a password.');
-    valid=false;
-  }else if(password.length<8){
-    setFieldError('passwordInput','passwordError','Password must be at least 8 characters.');
-    valid=false;
-  }
-
-  if(!id){
-    setFieldError('idInput','idError',selectedRole==='student'?'Please enter your student number.':'Please enter your South African ID number.');
-    valid=false;
-  }else if(selectedRole==='landlord' && !/^\d{13}$/.test(id)){
-    setFieldError('idInput','idError','South African ID numbers must contain exactly 13 digits.');
-    valid=false;
-  }else if(selectedRole==='student' && !/^\d{6,13}$/.test(id)){
-    setFieldError('idInput','idError','Student numbers must contain between 6 and 13 digits.');
-    valid=false;
-  }
-  return valid;
-}
-function numericOnly(input){
-  if(!input) return;
-  input.addEventListener('input',()=>{
-    input.value=input.value.replace(/\D/g,'').slice(0,input.maxLength||999);
-  });
-}
-
 
 function isValidEmail(email){
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
 }
 function isValidName(name){
-  return /^[A-Za-zÀ-ÿ' -]{2,60}$/.test(name);
+  return selectedRole==='landlord' ? /^[A-Za-z0-9-]{4,30}$/.test(name) : /^[A-Za-zÀ-ÿ' -]{2,60}$/.test(name);
 }
 function passwordScore(password){
   let score=0;
@@ -690,7 +621,8 @@ function validateRegistration(name,email,password,id){
 }
 function setupInputValidation(){
   const name=$('nameInput'),email=$('emailInput'),password=$('passwordInput'),id=$('idInput');
-  name.addEventListener('input',()=>{name.value=name.value.replace(/[^A-Za-zÀ-ÿ' -]/g,'').slice(0,60)});
+  name.addEventListener('input',()=>{name.value=name.value.replace(selectedRole==='landlord'?/[^A-Za-z0-9-]/g:/[^A-Za-zÀ-ÿ' -]/g,'').slice(0,60)});
+
   email.addEventListener('input',()=>{if(email.value && !isValidEmail(email.value)) setValidation('emailInput','emailValidation','Please enter a valid email address.',false)});
   password.addEventListener('input',()=>{
     const score=passwordScore(password.value);
@@ -716,25 +648,12 @@ function chooseRole(role){
 
 function showScreen(id){
   
-numericOnly($('idInput'));
-['nameInput','emailInput','passwordInput','idInput'].forEach(id=>{
-  $(id)?.addEventListener('input',()=>clearAllAuthErrors());
-});
-
 
 document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   $(id).classList.add('active');
   window.scrollTo(0,0);
 }
-function toggleAuth(){
-  isRegistering=!isRegistering;
-  $('authTitle').innerHTML=isRegistering?'Student<br>Stay':'Welcome<br>Back';
-  $('switchText').textContent=isRegistering?'Already registered?':"Don't have an account?";
-  $('switchLink').textContent=isRegistering?'Sign in':'Create account';
-  $('nameInput').placeholder=isRegistering?'Landlord Account Number':'Email';
-  $('idInput').placeholder=isRegistering?'ID Number':'Password';
-}
-$('authForm').addEventListener('submit',e=>{
+$('authForm').addEventListener('submit',async e=>{
   e.preventDefault();
   const name=$('nameInput').value.trim();
   const email=$('emailInput').value.trim().toLowerCase();
@@ -749,9 +668,11 @@ $('authForm').addEventListener('submit',e=>{
     return;
   }
 
+  const salt=crypto.randomUUID();
   localStorage.setItem('studentStayUser',JSON.stringify({
-    name,email,password,id,role:selectedRole
+    name,email,salt,hash:await sha256(salt+password),role:selectedRole
   }));
+
   $('authError').textContent='';
   if(selectedRole==='student'){
     $('studentUserName').textContent=name||'Student';
@@ -763,8 +684,7 @@ $('authForm').addEventListener('submit',e=>{
     setTimeout(()=>showScreen('homeScreen'),600);
   }
 });
-$('loginForm').addEventListener('submit',e=>{
-  e.preventDefault();
+$('loginForm').addEventListener('submit',async e=>{  e.preventDefault();
   const email=$('loginEmail').value.trim().toLowerCase();
   const password=$('loginPassword').value;
   $('loginError').textContent='';
@@ -785,7 +705,7 @@ $('loginForm').addEventListener('submit',e=>{
     setValidation('loginEmail','loginEmailValidation','No account exists with this email.',false);
     return;
   }
-  if(saved.password!==password){
+  if(saved.hash!==await sha256(saved.salt+password)){
     setValidation('loginPassword','loginPasswordValidation','Incorrect password.',false);
     return;
   }
@@ -865,32 +785,32 @@ $('propertySearch').addEventListener('input',e=>{
 const landlordProperties = [
   {
     id:1,name:'One Thibault Residence',location:'Cape Town, Western Cape',
-    type:'Student Residence',rooms:24,occupied:21,monthlyIncome:27180,
+    type:'Student Residence',rooms:24,occupied:21,monthlyIncome:73500,
     amenities:'Fibre Wi-Fi, 24/7 Security, Laundry, Study Area',
     tenants:[
-      {name:'Lebo Maseko',age:21,course:'BCom Accounting',phone:'072 111 2233',email:'lebo@example.com',room:'A101',rent:1290,paid:true,lastPayment:'01 July 2026'},
-      {name:'Zanele Khumalo',age:22,course:'BSc Computer Science',phone:'073 222 3344',email:'zanele@example.com',room:'A102',rent:1290,paid:true,lastPayment:'01 July 2026'},
-      {name:'Michael Naidoo',age:20,course:'BA Media Studies',phone:'074 333 4455',email:'michael@example.com',room:'A103',rent:1290,paid:false,lastPayment:'01 June 2026'},
-      {name:'Amogelang Molefe',age:23,course:'LLB Law',phone:'075 444 5566',email:'amogelang@example.com',room:'A104',rent:1290,paid:true,lastPayment:'02 July 2026'}
+      {name:'Lebo Maseko',age:21,course:'BCom Accounting',phone:'072 111 2233',email:'lebo@example.com',room:'A101',rent:3500,paid:true,lastPayment:'01 July 2026'},
+      {name:'Zanele Khumalo',age:22,course:'BSc Computer Science',phone:'073 222 3344',email:'zanele@example.com',room:'A102',rent:3500,paid:true,lastPayment:'01 July 2026'},
+      {name:'Michael Naidoo',age:20,course:'BA Media Studies',phone:'074 333 4455',email:'michael@example.com',room:'A103',rent:3500,paid:false,lastPayment:'01 June 2026'},
+      {name:'Amogelang Molefe',age:23,course:'LLB Law',phone:'075 444 5566',email:'amogelang@example.com',room:'A104',rent:3500,paid:true,lastPayment:'02 July 2026'}
     ]
   },
   {
     id:2,name:'The Hub Braamfontein',location:'Johannesburg, Gauteng',
-    type:'Student Apartments',rooms:24,occupied:21,monthlyIncome:28350,
+    type:'Student Apartments',rooms:24,occupied:21,monthlyIncome:73500,
     amenities:'Fibre Wi-Fi, Security, Parking, Communal Lounge',
     tenants:[
-      {name:'Thando Dube',age:21,course:'BSc Engineering',phone:'076 555 6677',email:'thando@example.com',room:'B201',rent:1350,paid:true,lastPayment:'01 July 2026'},
-      {name:'Naledi Radebe',age:20,course:'BA Psychology',phone:'077 666 7788',email:'naledi@example.com',room:'B202',rent:1350,paid:false,lastPayment:'01 June 2026'},
-      {name:'Ethan Williams',age:22,course:'BCom Finance',phone:'078 777 8899',email:'ethan@example.com',room:'B203',rent:1350,paid:true,lastPayment:'01 July 2026'}
+      {name:'Thando Dube',age:21,course:'BSc Engineering',phone:'076 555 6677',email:'thando@example.com',room:'B201',rent:3500,paid:true,lastPayment:'01 July 2026'},
+      {name:'Naledi Radebe',age:20,course:'BA Psychology',phone:'077 666 7788',email:'naledi@example.com',room:'B202',rent:3500,paid:false,lastPayment:'01 June 2026'},
+      {name:'Ethan Williams',age:22,course:'BCom Finance',phone:'078 777 8899',email:'ethan@example.com',room:'B203',rent:3500,paid:true,lastPayment:'01 July 2026'}
     ]
   },
   {
     id:3,name:'Studios on Florida',location:'Durban, KwaZulu-Natal',
-    type:'Studio Apartments',rooms:18,occupied:10,monthlyIncome:11500,
+    type:'Studio Apartments',rooms:18,occupied:10,monthlyIncome:45000,
     amenities:'Fibre Wi-Fi, CCTV, Secure Access',
     tenants:[
-      {name:'Siyabonga Zulu',age:22,course:'BCom Marketing',phone:'079 888 9900',email:'siyabonga@example.com',room:'C301',rent:1150,paid:true,lastPayment:'01 July 2026'},
-      {name:'Anele Mthembu',age:21,course:'BSc Biology',phone:'081 111 2233',email:'anele@example.com',room:'C302',rent:1150,paid:true,lastPayment:'01 July 2026'}
+      {name:'Siyabonga Zulu',age:22,course:'BCom Marketing',phone:'079 888 9900',email:'siyabonga@example.com',room:'C301',rent:4500,paid:true,lastPayment:'01 July 2026'},
+      {name:'Anele Mthembu',age:21,course:'BSc Biology',phone:'081 111 2233',email:'anele@example.com',room:'C302',rent:4500,paid:true,lastPayment:'01 July 2026'}
     ]
   }
 ];
@@ -907,7 +827,7 @@ function renderLandlordProperties(){
   renderListingFeeSummary();
   accommodations.forEach(a=>{if(!landlordProperties.some(p=>p.name===a.name))landlordProperties.push({id:a.id,name:a.name,location:a.city,type:a.type||'Student accommodation',rooms:Number(a.availableRooms||0),occupied:0,monthlyIncome:0,amenities:a.amenities||'',tenants:[]})});
   const cards=$('propertyCards');
-  if(cards)cards.innerHTML=accommodations.map(a=>`<div class="card" data-status="${escapeHTML((a.status||'available').toLowerCase())}"><div class="card-img"></div><div class="card-body"><h4>${escapeHTML(a.name)}</h4><div class="price">R${Number(a.price).toLocaleString()}/student/month</div><div class="small">${escapeHTML(a.city)} · ${Number(a.availableRooms||0)} rooms available</div><button class="secondary" style="margin-top:10px" onclick="openModal(${a.id})">Edit listing</button></div></div>`).join('');
+  if(cards)cards.innerHTML=accommodations.map(a=>`<div class="card" data-status="${escapeHTML((a.status||'available').toLowerCase())}"><div class="card-img"></div><div class="card-body"><h4>${escapeHTML(a.name)}</h4><div class="price">R${Number(a.price).toLocaleString()}/room/month</div><div class="small">${escapeHTML(a.city)} · ${Number(a.availableRooms||0)} rooms available</div><button class="secondary" style="margin-top:10px" onclick="openModal(${a.id})">Edit listing</button></div></div>`).join('');
   container.innerHTML=landlordProperties.map(p=>{ const listing=accommodations.find(a=>a.name===p.name)||accommodations[p.id-1]; return `
     <div style="border:1px solid #ddd;border-radius:18px;padding:20px;margin-bottom:18px">
       <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
@@ -921,7 +841,7 @@ function renderLandlordProperties(){
         <div style="background:#f7f7f7;padding:12px;border-radius:10px"><b>R${p.monthlyIncome.toLocaleString()}</b><br><span class="small">Monthly Income</span></div>
       </div>
       <div class="detail-list">
-        <div class="detail-item"><b>Monthly rent per student</b>R${Number(listing?.price||0).toLocaleString()}</div>
+        <div class="detail-item"><b>Monthly rent per room</b>R${Number(listing?.price||0).toLocaleString()}</div>
         <div class="detail-item"><b>Deposit</b>R${Number(listing?.deposit||0).toLocaleString()}</div>
         <div class="detail-item"><b>Available rooms</b>${Number(listing?.availableRooms||0)}</div>
         <div class="detail-item"><b>University</b>${escapeHTML(listing?.university||'Not specified')}</div>
@@ -980,17 +900,26 @@ function renderLandlordProfile(){
 }
 
 const defaultAccommodations = [
-  {id:1,name:'One Thibault Residence',city:'Cape Town, Western Cape',price:1290,university:'UCT',status:'Available',landlord:'Thabo Mokoena',phone:'071 234 5678',email:'thabo@onethibault.co.za',type:'Student Residence',deposit:1290,availableRooms:3,amenities:'Fibre Wi-Fi, 24/7 security, laundry, study area',description:'Student residence in central Cape Town. Confirm room type, lease length and included utilities with the landlord before booking.',rules:'Visitors and quiet-hour rules to be confirmed with landlord.'},
-  {id:2,name:'The Hub Braamfontein',city:'Johannesburg, Gauteng',price:1350,university:'Wits University',status:'Available',landlord:'Naledi Dlamini',phone:'072 456 7890',email:'naledi@thehub.co.za',type:'Student Apartments',deposit:1350,availableRooms:3,amenities:'Fibre Wi-Fi, security, parking, communal lounge',description:'Student apartments in Braamfontein close to Wits. Confirm whether utilities are included and the current room availability.',rules:'Building access and visitor rules apply.'},
-  {id:3,name:'Studios on Florida',city:'Durban, KwaZulu-Natal',price:1150,university:'UKZN Howard',status:'Available',landlord:'Sibusiso Ndlovu',phone:'073 111 2233',email:'sibusiso@studiosflorida.co.za',type:'Studio Apartments',deposit:1150,availableRooms:8,amenities:'Fibre Wi-Fi, CCTV, secure access',description:'Studio accommodation in Durban near UKZN Howard campus. Contact the landlord to confirm furnishing and lease details.',rules:'Secure access rules apply.'},
-  {id:4,name:'The Terrace Hatfield',city:'Pretoria, Gauteng',price:1400,university:'UP Hatfield',status:'Available',landlord:'Kagiso Molefe',phone:'074 222 3344',email:'kagiso@terracehatfield.co.za',type:'Student Residence',deposit:1400,availableRooms:5,amenities:'Study area, secure access, Wi-Fi',description:'Student accommodation in Hatfield near the University of Pretoria campus. Confirm included services with the landlord.',rules:'House rules and lease conditions available from landlord.'},
-  {id:5,name:'Campus Edge Mowbray',city:'Cape Town, Western Cape',price:980,university:'UCT',status:'Available',landlord:'Ayesha Daniels',phone:'076 555 6677',email:'ayesha@campusedge.co.za',type:'Shared House',deposit:980,availableRooms:4,amenities:'Furnished rooms, shared kitchen, Wi-Fi',description:'Shared student housing in Mowbray with access to UCT. Ask about transport, utilities and room sharing.',rules:'Shared-space and visitor rules apply.'},
-  {id:6,name:'Park House Student Living',city:'Johannesburg, Gauteng',price:1200,university:'UJ',status:'Available',landlord:'Lerato Nkosi',phone:'078 888 9900',email:'lerato@parkhouse.co.za',type:'Student Residence',deposit:1200,availableRooms:6,amenities:'Wi-Fi, security, communal study space',description:'Student living near the University of Johannesburg. Check the specific campus distance and lease dates with the landlord.',rules:'Residence rules apply.'},
-  {id:7,name:'Varsity Village',city:'Bloemfontein, Free State',price:850,university:'UFS',status:'Available',landlord:'Pieter Jacobs',phone:'079 333 4455',email:'pieter@varsityvillage.co.za',type:'Shared House',deposit:850,availableRooms:7,amenities:'Furnished rooms, shared kitchen, secure entry',description:'Affordable student accommodation in Bloemfontein near UFS. Confirm what is included in monthly rent.',rules:'Shared-house rules apply.'},
-  {id:8,name:'The Nest Stellenbosch',city:'Stellenbosch, Western Cape',price:1600,university:'Stellenbosch University',status:'Available',landlord:'Mia van der Merwe',phone:'082 666 7788',email:'mia@thenest.co.za',type:'Student Apartments',deposit:1600,availableRooms:2,amenities:'Fibre Wi-Fi, furnished rooms, laundry',description:'Student accommodation in Stellenbosch close to Stellenbosch University. Confirm availability, lease dates and utilities.',rules:'Building rules apply.'}
+  {id:1,name:'One Thibault Residence',city:'Cape Town, Western Cape',price:3500,roomType:'Single room',university:'UCT',status:'Available',landlord:'Thabo Mokoena',phone:'071 234 5678',email:'thabo@onethibault.co.za',type:'Student Residence',deposit:3500,availableRooms:3,amenities:'Fibre Wi-Fi, 24/7 security, laundry, study area',description:'Student residence in central Cape Town. Confirm room type, lease length and included utilities with the landlord before booking.',rules:'Visitors and quiet-hour rules to be confirmed with landlord.'},
+  {id:2,name:'The Hub Braamfontein',city:'Johannesburg, Gauteng',price:3500,roomType:'Single room',university:'Wits University',status:'Available',landlord:'Naledi Dlamini',phone:'072 456 7890',email:'naledi@thehub.co.za',type:'Student Apartments',deposit:3500,availableRooms:3,amenities:'Fibre Wi-Fi, security, parking, communal lounge',description:'Student apartments in Braamfontein close to Wits. Confirm whether utilities are included and the current room availability.',rules:'Building access and visitor rules apply.'},
+  {id:3,name:'Studios on Florida',city:'Durban, KwaZulu-Natal',price:4500,roomType:'Double room',university:'UKZN Howard',status:'Available',landlord:'Sibusiso Ndlovu',phone:'073 111 2233',email:'sibusiso@studiosflorida.co.za',type:'Studio Apartments',deposit:4500,availableRooms:8,amenities:'Fibre Wi-Fi, CCTV, secure access',description:'Studio accommodation in Durban near UKZN Howard campus. Contact the landlord to confirm furnishing and lease details.',rules:'Secure access rules apply.'},
+  {id:4,name:'The Terrace Hatfield',city:'Pretoria, Gauteng',price:4500,roomType:'Double room',university:'UP Hatfield',status:'Available',landlord:'Kagiso Molefe',phone:'074 222 3344',email:'kagiso@terracehatfield.co.za',type:'Student Residence',deposit:4500,availableRooms:5,amenities:'Study area, secure access, Wi-Fi',description:'Student accommodation in Hatfield near the University of Pretoria campus. Confirm included services with the landlord.',rules:'House rules and lease conditions available from landlord.'},
+  {id:5,name:'Campus Edge Mowbray',city:'Cape Town, Western Cape',price:3500,roomType:'Single room',university:'UCT',status:'Available',landlord:'Ayesha Daniels',phone:'076 555 6677',email:'ayesha@campusedge.co.za',type:'Shared House',deposit:3500,availableRooms:4,amenities:'Furnished rooms, shared kitchen, Wi-Fi',description:'Shared student housing in Mowbray with access to UCT. Ask about transport, utilities and room sharing.',rules:'Shared-space and visitor rules apply.'},
+  {id:6,name:'Park House Student Living',city:'Johannesburg, Gauteng',price:3500,roomType:'Single room',university:'UJ',status:'Available',landlord:'Lerato Nkosi',phone:'078 888 9900',email:'lerato@parkhouse.co.za',type:'Student Residence',deposit:3500,availableRooms:6,amenities:'Wi-Fi, security, communal study space',description:'Student living near the University of Johannesburg. Check the specific campus distance and lease dates with the landlord.',rules:'Residence rules apply.'},
+  {id:7,name:'Varsity Village',city:'Bloemfontein, Free State',price:4500,roomType:'Double room',university:'UFS',status:'Available',landlord:'Pieter Jacobs',phone:'079 333 4455',email:'pieter@varsityvillage.co.za',type:'Shared House',deposit:4500,availableRooms:7,amenities:'Furnished rooms, shared kitchen, secure entry',description:'Affordable student accommodation in Bloemfontein near UFS. Confirm what is included in monthly rent.',rules:'Shared-house rules apply.'},
+  {id:8,name:'The Nest Stellenbosch',city:'Stellenbosch, Western Cape',price:4500,roomType:'Double room',university:'Stellenbosch University',status:'Available',landlord:'Mia van der Merwe',phone:'082 666 7788',email:'mia@thenest.co.za',type:'Student Apartments',deposit:4500,availableRooms:2,amenities:'Fibre Wi-Fi, furnished rooms, laundry',description:'Student accommodation in Stellenbosch close to Stellenbosch University. Confirm availability, lease dates and utilities.',rules:'Building rules apply.'}
 ];
+if(localStorage.getItem('studentStayDataVersion')!=='2'){localStorage.removeItem('studentStayAccommodations');localStorage.setItem('studentStayDataVersion','2')}
 let accommodations=JSON.parse(localStorage.getItem('studentStayAccommodations')||'null')||defaultAccommodations;
 let editingAccommodationId=null;
+const RENT_VAT_RATE=0.15; //15% VAT: same rate as the Java prototype and the Excel model
+function rentWithVat(rent){return Math.round(rent*(1+RENT_VAT_RATE)*100)/100}
+function rand2(n){return 'R'+Number(n).toLocaleString('en-ZA',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function updatePaymentAmount(){
+  const a=accommodations.find(x=>x.id===Number($('paymentProperty').value));if(!a)return;
+  $('paymentAmount').value=rentWithVat(a.price);
+  $('paymentBreakdown').textContent=`Rent ${rand2(a.price)} + VAT (15%) ${rand2(a.price*RENT_VAT_RATE)} = ${rand2(rentWithVat(a.price))}`;
+}
 let paymentRecords=JSON.parse(localStorage.getItem('studentStayPayments')||'[]');
 renderPaymentNotifications();
 
@@ -1003,7 +932,7 @@ function accommodationCard(a){
       <div style="display:flex;justify-content:space-between;gap:8px"><h4>${escapeHTML(a.name)}</h4>
       <button aria-label="Save ${escapeHTML(a.name)}" onclick="toggleSaved(${a.id})" style="border:0;background:none;font-size:24px">${saved?'♥':'♡'}</button></div>
       <div class="small">📍 ${escapeHTML(a.city)} · ${escapeHTML(a.type||'Student accommodation')}</div>
-      <div class="price">R${Number(a.price).toLocaleString()}/month</div>
+      <div class="price">R${Number(a.price).toLocaleString()}/room/month</div>
       <div class="small">🎓 Near ${escapeHTML(a.university||'University details to be confirmed')}<br>🔑 ${escapeHTML(String(a.availableRooms??'Availability to be confirmed'))} rooms available<br>🛏 ${escapeHTML(a.roomType||a.type||'Room details to be confirmed')}<br>✓ ${escapeHTML(a.amenities||'Ask landlord for amenities')}</div>
       <button class="secondary" style="margin-top:12px;width:100%" onclick="showAccommodationDetails(${a.id})">View full details</button>
       <button class="cta" style="margin-top:8px;width:100%" onclick="startPayment(${a.id})">Pay / record rent</button>
@@ -1016,7 +945,7 @@ function showAccommodationDetails(id){
   $('accommodationDetailsContent').innerHTML=`<div class="small">${escapeHTML(a.type||'Student accommodation')}</div><h2>${escapeHTML(a.name)}</h2>
     <p>📍 ${escapeHTML(a.city)}<br>🎓 Near ${escapeHTML(a.university||'University to be confirmed')}</p>
     <p>${escapeHTML(a.description||'Contact the landlord for more information.')}</p>
-    <div class="detail-list"><div class="detail-item"><b>Monthly rent</b>R${Number(a.price).toLocaleString()}</div><div class="detail-item"><b>Deposit</b>R${Number(a.deposit||0).toLocaleString()}</div><div class="detail-item"><b>Rooms available</b>${Number(a.availableRooms||0)}</div><div class="detail-item"><b>Room type</b>${escapeHTML(a.roomType||a.type||'Confirm with landlord')}</div><div class="detail-item"><b>Utilities</b>${escapeHTML(a.utilities||'Confirm with landlord')}</div><div class="detail-item"><b>Campus distance / transport</b>${escapeHTML(a.distance||'Confirm with landlord')}</div><div class="detail-item"><b>Lease dates and terms</b>${escapeHTML(a.leaseTerms||'Confirm with landlord')}</div><div class="detail-item"><b>Availability</b>${escapeHTML(a.status||'Contact landlord')}</div></div>
+    <div class="detail-list"><div class="detail-item"><b>Monthly rent per room (excl. VAT)</b>R${Number(a.price).toLocaleString()}</div><div class="detail-item"><b>Rent incl. VAT (15%)</b>${rand2(rentWithVat(a.price))}</div><div class="detail-item"><b>Deposit</b>R${Number(a.deposit||0).toLocaleString()}</div><div class="detail-item"><b>Rooms available</b>${Number(a.availableRooms||0)}</div><div class="detail-item"><b>Room type</b>${escapeHTML(a.roomType||a.type||'Confirm with landlord')}</div><div class="detail-item"><b>Utilities</b>${escapeHTML(a.utilities||'Confirm with landlord')}</div><div class="detail-item"><b>Campus distance / transport</b>${escapeHTML(a.distance||'Confirm with landlord')}</div><div class="detail-item"><b>Lease dates and terms</b>${escapeHTML(a.leaseTerms||'Confirm with landlord')}</div><div class="detail-item"><b>Availability</b>${escapeHTML(a.status||'Contact landlord')}</div></div>
     <div class="detail-item"><b>Amenities and security</b>${escapeHTML(a.amenities||'Ask landlord for details')}</div>
     <p><b>House rules:</b> ${escapeHTML(a.rules||'Confirm house rules with the landlord.')}</p>
     <p><b>Landlord:</b> ${escapeHTML(a.landlord||'Student Stay landlord')}<br><b>Contact:</b> ${escapeHTML(a.phone||'Use the contact page')} · ${escapeHTML(a.email||'')}</p>
@@ -1028,7 +957,7 @@ function closeDetailsModal(){$('accommodationDetailsModal').classList.remove('op
 function startPayment(id){
   const a=accommodations.find(x=>x.id===id);if(!a)return;
   $('paymentProperty').innerHTML=accommodations.map(x=>`<option value="${x.id}">${escapeHTML(x.name)} — R${Number(x.price).toLocaleString()}/month</option>`).join('');
-  $('paymentProperty').value=String(id);$('paymentAmount').value=a.price;
+  $('paymentProperty').value=String(id);updatePaymentAmount();
   $('paymentMonth').value=new Date().toISOString().slice(0,7);$('paymentMethod').value='';toggleCardEntry();
   ['cardholderName','cardNumber','cardExpiry','cardCvv'].forEach(id=>{const f=$(id);if(f)f.value=''});
   renderStudentPaymentHistory();showScreen('studentPaymentScreen');
@@ -1115,6 +1044,302 @@ function logout(){
 }
 
 function escapeHTML(str){str=String(str??'');return str.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+</script>
+<script>
+/*
+ * File    : StudentStay_Additions.js
+ * Project : Student Stay - JGA 2026
+ * Purpose : Adds what the JGA brief asks for and the prototype did not yet have:
+ *           About, Customer Persona, Revenue Model (with VAT), Analytics charts and
+ *           statistics, Recommendations, Sources, Contact, an FAQ chatbot, the logo,
+ *           a working "Sign in" link, and a demo listing-fee flow.
+ * Use     : this code is inlined at the end of index.html, after the main script.
+ *           It uses the main script's globals: showScreen, escapeHTML, accommodations.
+ */
+(function () {
+  'use strict';
+
+  var LOGO = 'logo.png';
+  var $q = function (s) { return document.querySelector(s); };
+  var esc = function (s) { return escapeHTML(s); };
+  var money = function (n) { return 'R' + Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); };
+  var rand = function (n) { return 'R' + Math.round(n).toLocaleString('en-ZA'); };
+
+  // ---- Parameters and variables: same values as StudentStay_Financial_Model.xlsx ----
+  var M = { S: 250, VAT: 0.15, D: 100, P0: 5, N: 8, C: 0.03, V: 4, P1: 0.30, P2: 0.10, FD: 30, NP: 50,
+            F: 0.03, H: 300, A: 200, MK: 1500, VER: 50, K: 2500 };
+
+  /** Year-1 model. L(t) = L(t-1) + n - round(c * L(t-1)); R = S*L + fees; profit = R - C */
+  function model() {
+    var rows = [], landlords = M.P0;
+    for (var m = 1; m <= 12; m++) {
+      var opening = landlords;
+      landlords = opening + M.N - Math.round(opening * M.C);
+      var viewings = landlords * M.V;
+      var subs = landlords * M.S;
+      var fees = viewings * (M.P1 * M.FD + M.P2 * M.NP);
+      var cost = M.H + M.A + M.MK + M.N * M.VER + M.F * M.D * viewings + (m === 1 ? M.K : 0);
+      rows.push({ m: m, L: landlords, subs: subs, fees: fees, rev: subs + fees, cost: cost, net: subs + fees - cost });
+    }
+    return rows;
+  }
+
+  function median(a) {
+    var s = a.slice().sort(function (x, y) { return x - y; }), h = Math.floor(s.length / 2);
+    return s.length % 2 ? s[h] : (s[h - 1] + s[h]) / 2;
+  }
+
+  // ---- tiny SVG / HTML charts (no libraries) ----
+  function vbars(vals, labels, color, aria) {
+    var W = 560, H = 190, top = 14, bot = 26, left = 46, n = vals.length;
+    var mx = Math.max.apply(null, vals.concat(0)), mn = Math.min.apply(null, vals.concat(0));
+    var y = function (v) { return top + (mx - v) / ((mx - mn) || 1) * (H - top - bot); };
+    var step = (W - left) / n, bw = step * 0.7;
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="' + esc(aria) + '">';
+    s += '<line x1="' + left + '" x2="' + W + '" y1="' + y(0) + '" y2="' + y(0) + '" stroke="#999"/>';
+    [mx, 0].concat(mn < 0 ? [mn] : []).forEach(function (t) {
+      s += '<text x="' + (left - 4) + '" y="' + (y(t) + 4) + '" text-anchor="end">' + (Math.abs(t) >= 1000 ? Math.round(t / 1000) + 'k' : Math.round(t)) + '</text>';
+    });
+    vals.forEach(function (v, i) {
+      var x = left + i * step + (step - bw) / 2;
+      s += '<rect x="' + x + '" y="' + Math.min(y(v), y(0)) + '" width="' + bw + '" height="' + Math.max(1, Math.abs(y(v) - y(0))) +
+           '" rx="3" fill="' + (v < 0 ? '#f28423' : color) + '"><title>' + esc(labels[i]) + ': ' + Math.round(v) + '</title></rect>' +
+           '<text x="' + (x + bw / 2) + '" y="' + (H - 8) + '" text-anchor="middle">' + esc(labels[i]) + '</text>';
+    });
+    return s + '</svg>';
+  }
+
+  function hbars(rows, max, color) {
+    return rows.map(function (r) {
+      return '<div style="display:flex;align-items:center;gap:8px;margin:6px 0;font-size:13px">' +
+        '<span style="flex:0 0 38%">' + esc(r[0]) + '</span>' +
+        '<span style="flex:1;background:#eef3f4;border-radius:6px;height:16px"><i style="display:block;height:16px;border-radius:6px;background:' + color +
+        ';width:' + Math.max(2, r[1] / max * 100) + '%"></i></span><b style="flex:0 0 70px;text-align:right">' + esc(r[2]) + '</b></div>';
+    }).join('');
+  }
+
+  // ---- panels ----
+  function rentTable() {
+    var rows = [['Single room', 3500], ['Double room', 4500]].map(function (r) { var v = r[1] * M.VAT; return '<tr><td>' + r[0] + '</td><td>' + money(r[1]) + '</td><td>' + money(v) + '</td><td><b>' + money(r[1] + v) + '</b></td></tr>'; }).join('');
+    return '<div class="ib"><h3>Rent examples (per room, per month)</h3><table><tr><th>Room</th><th>Rent</th><th>VAT 15%</th><th>Total</th></tr>' + rows + '</table><p class="small">Same rents as the Java prototype and the Excel model.</p></div>';
+  }
+  var panels = {
+    about: function () {
+      return '<div class="ib"><h3>The problem</h3><p>Many South African university students struggle to find accommodation that is affordable, safe and close to campus. ' +
+        'Social media listings expose them to scams and outdated information, and incompatible roommates cause conflict that affects well-being and results.</p></div>' +
+        '<div class="ib"><h3>Aim</h3><p>A secure, user-friendly platform that helps students find safe, affordable and suitable accommodation, and helps landlords reach verified students.</p>' +
+        '<h3>Objectives</h3><ol><li>Provide verified and reliable listings.</li><li>Reduce exposure to scams and outdated information.</li>' +
+        '<li>Give students and landlords one place to communicate.</li><li>Match students with compatible roommates (planned).</li>' +
+        '<li>Show that the business is financially viable.</li></ol></div>';
+    },
+    persona: function () {
+      return '<div class="ib"><h3>Thandi, 19, first-year student</h3><p class="small">Fictional persona</p>' +
+        '<p><b>Challenge:</b> residence is full, her budget is fixed by bursary funding, and rooms advertised in social media groups may be fake.</p>' +
+        '<p><b>How Student Stay helps:</b> she searches verified listings by university or city, sees rent and deposit up front and saves favourites.</p></div>' +
+        '<div class="ib"><h3>Mrs Dlamini, landlord</h3><p class="small">Fictional persona</p>' +
+        '<p><b>Challenge:</b> empty rooms every January and no way to prove her property is genuine.</p>' +
+        '<p><b>How Student Stay helps:</b> a verified listing builds trust, and one R250 monthly fee per accommodation puts her rooms in front of students.</p></div>';
+    },
+    revenue: function () {
+      var vat = M.S * M.VAT;
+      return '<div class="ib"><h3>How Student Stay earns money</h3><table>' +
+        '<tr><th>Item</th><th>Amount</th></tr>' +
+        '<tr><td>Student account</td><td>Free</td></tr>' +
+        '<tr><td>Landlord listing fee (per accommodation, per month)</td><td>' + money(M.S) + '</td></tr>' +
+        '<tr><td>VAT at 15% (S &times; r)</td><td>' + money(vat) + '</td></tr>' +
+        '<tr><td><b>Total charged (S &times; (1 + r))</b></td><td><b>' + money(M.S + vat) + '</b></td></tr>' +
+        '<tr><td>Per year, one listing</td><td>' + money((M.S + vat) * 12) + '</td></tr></table></div>' +
+        rentTable() + '<div class="ib"><h3>R100 viewing deposit rules</h3><table><tr><th>Outcome</th><th>Student</th><th>Landlord</th><th>Platform</th></tr>' +
+        '<tr><td>Attends and declines</td><td>R70</td><td>R0</td><td>R30</td></tr>' +
+        '<tr><td>Does not attend</td><td>R0</td><td>R50</td><td>R50</td></tr>' +
+        '<tr><td>No decision in 72 hours</td><td>R100</td><td>R0</td><td>R0</td></tr></table>' +
+        '<p class="small">Deposit handling is a design rule only. This prototype moves no money.</p></div>' +
+        '<div class="ib"><h3>Try the model</h3><label for="ssCalc">Paying landlords: <b id="ssCalcV">40</b></label>' +
+        '<input id="ssCalc" type="range" min="1" max="100" value="40" style="width:100%"><div id="ssCalcOut"></div></div>';
+    },
+    analytics: function () {
+      var rows = model(), labels = rows.map(function (r) { return r.m; });
+      var list = accommodations.filter(function (a) { return a.listingFeePaid !== false; });
+      var rents = list.map(function (a) { return Number(a.price); });
+      var mean = rents.reduce(function (a, b) { return a + b; }, 0) / (rents.length || 1);
+      var subs = rows.reduce(function (a, r) { return a + r.subs; }, 0), fees = rows.reduce(function (a, r) { return a + r.fees; }, 0);
+      var share = subs / (subs + fees) * 100;
+      var stats = rents.length
+        ? '<table><tr><th>Statistic</th><th>Monthly rent</th></tr><tr><td>Listings</td><td>' + rents.length + '</td></tr>' +
+          '<tr><td>Mean</td><td>' + money(mean) + '</td></tr><tr><td>Median</td><td>' + money(median(rents)) + '</td></tr>' +
+          '<tr><td>Minimum</td><td>' + money(Math.min.apply(null, rents)) + '</td></tr><tr><td>Maximum</td><td>' + money(Math.max.apply(null, rents)) + '</td></tr>' +
+          '<tr><td>Range (max &minus; min)</td><td>' + money(Math.max.apply(null, rents) - Math.min.apply(null, rents)) + '</td></tr></table>' +
+          '<div style="margin-top:12px">' + hbars(list.map(function (a) { return [a.name, Number(a.price), rand(a.price)]; }), Math.max.apply(null, rents), '#0097b2') + '</div>'
+        : '<p class="small">No published listings yet.</p>';
+      return '<div class="ib"><h3>Live statistics from the listings in this app</h3>' + stats + '</div>' +
+        '<div class="ib"><h3>Year 1: paying landlords per month</h3>' + vbars(rows.map(function (r) { return r.L; }), labels, '#0097b2', 'Bar chart of paying landlords per month, growing from 13 to 86') +
+        '<p class="small">Model: start with 5 landlords, add 8 a month, 3% churn (assumptions).</p></div>' +
+        '<div class="ib"><h3>Year 1: monthly net profit (Rand)</h3>' + vbars(rows.map(function (r) { return r.net; }), labels, '#0097b2', 'Bar chart of monthly net profit: a small loss in month 1, then rising to about R22 900') +
+        '<p class="small">Orange = loss. Excludes salaries and tax, so real profit will be lower.</p></div>' +
+        '<div class="ib"><h3>Where revenue comes from (Year 1)</h3>' + hbars([['Listing fees', subs, share.toFixed(1) + '%'], ['Viewing service fees', fees, (100 - share).toFixed(1) + '%']], subs, '#f28423') + '</div>' +
+        '<div class="ib"><h3>Why roommate matching matters</h3>' + hbars([['Report roommate conflict', 40, '40%'], ['Caused by noise', 28, '28%'], ['Caused by lifestyle', 15, '15%']], 40, '#007b9d') +
+        '<p class="small">Quinn, Canevello &amp; Crocker (2023), as quoted in the group report.</p></div>';
+    },
+    ideas: function () {
+      return '<div class="ib"><h3>How can this business foster innovation and job creation in South Africa?</h3><ol>' +
+        '<li><b>Partner with university housing offices</b> so accredited landlords are verified once and shared with the platform.</li>' +
+        '<li><b>Create local jobs:</b> landlord verification officers, student campus ambassadors and customer-support staff, funded by the listing fee.</li>' +
+        '<li><b>Offer mentorship and free hosting credits</b> to first-year ICT students so more prototypes reach launch.</li>' +
+        '<li><b>Connect a South African payment gateway</b> to automate rent, deposits and 72-hour refunds.</li>' +
+        '<li><b>Add a no-code workflow</b> that sends booking confirmations and reminders.</li>' +
+        '<li><b>Extend the AI assistant</b> to answer in more than one South African language.</li></ol></div>';
+    },
+    sources: function () {
+      return '<div class="ib"><h3>Sources</h3><ul class="small" style="line-height:1.7">' +
+        '<li>Department of Higher Education and Training (2024) <i>Ministerial Committee Report on Student Housing</i>.</li>' +
+        '<li>Mkhize, O.S. (2026) Postgraduate women in South Africa grapple with a hidden housing crisis, <i>IOL</i>.</li>' +
+        '<li>Quinn, D.M., Canevello, A. and Crocker, J.K. (2023) <i>PLoS ONE</i>, 18(6), e0286709.</li>' +
+        '<li>Sowetan Live (2026) How UJ official ran a student rental scam to loot NSFAS.</li>' +
+        '<li>TimesLive (2026) Students &lsquo;left to suffer&rsquo; as four university SRCs call for NSFAS accommodation cap to be scrapped.</li></ul>' +
+        '<p class="small">Listings, people and prices in this prototype are demo data.</p></div>';
+    },
+    contact: function () {
+      return '<div class="ib"><h3>Contact the team</h3>' +
+        '<label for="ssCn">Name</label><input id="ssCn" class="wide-field" maxlength="60">' +
+        '<label for="ssCe">Email</label><input id="ssCe" type="email" class="wide-field" maxlength="120">' +
+        '<label for="ssCm">Message</label><textarea id="ssCm" class="wide-field" maxlength="500" style="min-height:80px"></textarea>' +
+        '<button class="cta" id="ssCs" type="button" style="width:100%">Send</button><div id="ssCr" class="small" role="status" style="margin-top:8px"></div>' +
+        '<p class="small">Demo form: nothing is stored or sent.</p></div>';
+    }
+  };
+  var tabs = [['about', 'About'], ['persona', 'Persona'], ['revenue', 'Revenue'], ['analytics', 'Analytics'], ['ideas', 'Ideas'], ['sources', 'Sources'], ['contact', 'Contact']];
+
+  // ---- inject styles ----
+  var css = document.createElement('style');
+  css.textContent =
+    ':root{--orange:#f28423;--orange-dark:#d9700f;--teal:#0097b2;--teal-dark:#007b9d}' +
+    '.ss-tabs{display:flex;gap:8px;overflow:auto;margin-bottom:16px}.ss-tabs button{flex:none;border:1px solid var(--line);background:#fff;border-radius:99px;padding:9px 14px;font-weight:700}' +
+    '.ss-tabs button.on{background:var(--teal);color:#fff;border-color:var(--teal)}' +
+    '.ib{border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px;background:#fff}.ib h3{margin:0 0 8px;color:var(--teal-dark)}' +
+    '.ib table{width:100%;border-collapse:collapse;font-size:14px}.ib th,.ib td{text-align:left;padding:7px 4px;border-bottom:1px solid #eee}' +
+    '.ib svg text{font:11px Arial,sans-serif;fill:#555}.ib ol,.ib ul{padding-left:20px;line-height:1.6}' +
+    '.ss-logo{display:block;margin:0 auto 12px;width:140px;height:auto}' +
+    '#ssChatBtn{position:fixed;right:16px;bottom:92px;z-index:15;border:0;border-radius:99px;background:var(--orange);color:#111;font-weight:700;padding:12px 16px;box-shadow:0 4px 14px rgba(0,0,0,.25)}' +
+    '#ssChat{position:fixed;right:16px;bottom:146px;z-index:15;width:min(340px,calc(100% - 32px));max-height:60vh;display:none;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.25)}' +
+    '#ssChat.on{display:flex}#ssLog{padding:10px;overflow:auto;flex:1;min-height:150px;font-size:14px}' +
+    '#ssLog p{margin:5px 0;padding:7px 10px;border-radius:10px;max-width:90%}#ssLog .u{background:var(--teal);color:#fff;margin-left:auto}#ssLog .b{background:#f1f5f6}' +
+    '.ss-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 10px 8px}.ss-chips button{border:1px solid var(--line);background:#fff;border-radius:99px;padding:4px 10px;font-size:12px}' +
+    '#ssChatForm{display:flex;gap:6px;padding:8px;border-top:1px solid var(--line)}#ssChatForm input{flex:1;border:1px solid #bbb;border-radius:8px;padding:9px}';
+  document.head.appendChild(css);
+
+  // ---- info hub screen ----
+  var lastScreen = 'roleScreen';
+  var baseShow = showScreen;
+  showScreen = function (id) { if (id !== 'infoScreen') { lastScreen = id; } baseShow(id); };
+
+  var hub = document.createElement('section');
+  hub.id = 'infoScreen'; hub.className = 'screen dashboard';
+  hub.innerHTML = '<div class="top"><div class="greeting">About<br><span>Student Stay</span></div></div><div class="section">' +
+    '<div class="ss-tabs" id="ssTabs">' + tabs.map(function (t) { return '<button type="button" data-t="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</div>' +
+    '<div id="ssBody"></div><button class="secondary" type="button" id="ssBack">Back</button></div>';
+  document.querySelector('.app').appendChild(hub);
+
+  function openTab(key) {
+    document.querySelectorAll('#ssTabs button').forEach(function (b) { b.classList.toggle('on', b.dataset.t === key); });
+    $q('#ssBody').innerHTML = panels[key]();
+    if (key === 'revenue') { calc(); }
+  }
+  function openInfo(key) { openTab(key || 'about'); showScreen('infoScreen'); }
+
+  function calc() {
+    var L = Number($q('#ssCalc').value), subs = L * M.S, vat = subs * M.VAT, fees = L * M.V * (M.P1 * M.FD + M.P2 * M.NP);
+    $q('#ssCalcV').textContent = L;
+    $q('#ssCalcOut').innerHTML = '<table><tr><td>Listing fees (excl. VAT)</td><td>' + money(subs) + '</td></tr><tr><td>VAT (15%)</td><td>' + money(vat) +
+      '</td></tr><tr><td>Viewing service fees</td><td>' + money(fees) + '</td></tr><tr><td><b>Revenue excl. VAT</b></td><td><b>' + money(subs + fees) + '</b></td></tr></table>';
+  }
+
+  $q('#ssTabs').addEventListener('click', function (e) { if (e.target.dataset.t) { openTab(e.target.dataset.t); } });
+  $q('#ssBack').addEventListener('click', function () { showScreen(lastScreen); });
+  $q('#ssBody').addEventListener('input', function (e) { if (e.target.id === 'ssCalc') { calc(); } });
+  $q('#ssBody').addEventListener('click', function (e) {
+    if (e.target.id !== 'ssCs') { return; }
+    var n = $q('#ssCn').value.trim(), m = $q('#ssCe').value.trim(), t = $q('#ssCm').value.trim(), out = $q('#ssCr');
+    if (n.length < 2) { out.textContent = 'Please enter your name.'; }
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(m)) { out.textContent = 'Please enter a valid email address.'; }
+    else if (t.length < 10) { out.textContent = 'Please write a message of at least 10 characters.'; }
+    else { out.textContent = 'Thanks, ' + n + '. This demo does not send messages.'; }
+  });
+
+  // ---- entry points ----
+  var infoBtn = function () {
+    var b = document.createElement('button'); b.type = 'button'; b.className = 'secondary'; b.textContent = 'About, pricing, analytics and sources';
+    b.style.cssText = 'width:100%;margin-top:14px'; b.addEventListener('click', function () { openInfo('about'); }); return b;
+  };
+  var roleWrap = $q('.role-wrap');
+  var logo = document.createElement('img'); logo.className = 'ss-logo'; logo.src = LOGO; logo.alt = 'Student Stay logo';
+  roleWrap.insertBefore(logo, roleWrap.firstChild);
+  roleWrap.appendChild(infoBtn());
+  document.querySelectorAll('.profile-box .cta').forEach(function (b) { b.parentNode.insertBefore(infoBtn(), b); });
+
+  // ---- "Sign in" link now opens the login screen; login screen links back to sign-up ----
+  $q('#switchLink').onclick = function () { showScreen('loginScreen'); };
+  var loginAuth = $q('#loginScreen .auth');
+  var sw = document.createElement('div'); sw.className = 'switch';
+  sw.innerHTML = "Don't have an account? <a style=\"font-weight:700;text-decoration:underline;cursor:pointer\">Create account</a>";
+  sw.querySelector('a').onclick = function () { showScreen('authScreen'); };
+  loginAuth.insertBefore(sw, loginAuth.querySelector('.hero-img'));
+
+  // ---- landlord listing fee: show VAT, and a demo payment so listings can go live ----
+  renderListingFeeSummary = function () {
+    var box = document.getElementById('listingFeeSummary'); if (!box) { return; }
+    var active = accommodations.filter(function (a) { return a.listingFeePaid !== false; }).length;
+    var pending = accommodations.length - active, ex = active * M.S, vat = ex * M.VAT;
+    box.innerHTML = '<b>Listing fee estimate</b><br>' + active + ' published listing' + (active === 1 ? '' : 's') + ' &times; ' + money(M.S) + ' = ' + money(ex) +
+      '<br>VAT (15%): ' + money(vat) + '<br><strong>Total per month: ' + money(ex + vat) + '</strong><br><span class="small">' + pending +
+      ' listing' + (pending === 1 ? '' : 's') + ' waiting for the fee. Payments are demo records only.</span>';
+  };
+  requestListingFeePayment = function () {
+    var a = accommodations.find(function (x) { return x.listingFeePaid === false; });
+    if (!a) { showToast('No listings are waiting for the fee'); return; }
+    a.listingFeePaid = true; a.status = 'Available';
+    localStorage.setItem('studentStayAccommodations', JSON.stringify(accommodations));
+    renderLandlordProperties(); renderStudentListings();
+    showToast('Demo: ' + money(M.S * (1 + M.VAT)) + ' (R250 + VAT) recorded. "' + a.name + '" is now visible to students.');
+  };
+
+  // ---- password hashing helper (used by the two small edits in the notes) ----
+  window.sha256 = async function (text) {
+    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+  };
+
+  // ---- FAQ chatbot (rule-based; replace answer() with a server-side AI call later) ----
+  var faq = [
+    [/listing fee|landlord.*(pay|price|cost|fee)|250/, 'Landlords pay R250 per accommodation per month plus 15% VAT, which is R287.50. A new listing stays hidden from students until the fee is paid.'],
+    [/vat|tax/, 'VAT is 15%. A single room at R3,500 adds R525 (R4,025 total) and a double at R4,500 adds R675 (R5,175 total). The R250 listing fee adds R37.50, so R287.50.'],
+    [/deposit|refund|viewing/, 'A R100 viewing deposit is planned. Attend and decline: R70 back, R30 fee. Do not attend: R50 to the landlord and R50 to the platform. No decision in 72 hours: full refund.'],
+    [/pay|payment|rent/, 'Payments in this prototype are demo records only. No card is charged and no money moves.'],
+    [/save|favourite|heart/, 'Tap the heart on a listing to save it. Saved homes appear on the Saved tab.'],
+    [/verif|scam|fake|safe/, 'Student Stay aims to show only verified landlords. Always confirm the landlord, viewing and lease before paying anyone.'],
+    [/contact|landlord.*(phone|email)|call/, 'Open the Contact tab to see each landlord\u2019s phone and email.'],
+    [/free|student.*(cost|price)/, 'Student accounts are free.'],
+    [/hello|hi$|hey/, 'Hello! Ask me about fees, VAT, deposits, saving homes or payments.']
+  ];
+  function answer(q) {
+    q = q.toLowerCase();
+    for (var i = 0; i < faq.length; i++) { if (faq[i][0].test(q)) { return faq[i][1]; } }
+    return 'I do not have an answer to that yet. Try asking about fees, VAT, deposits, payments or saving homes.';
+  }
+  var chatBtn = document.createElement('button'); chatBtn.id = 'ssChatBtn'; chatBtn.type = 'button'; chatBtn.textContent = 'Ask Student Stay';
+  chatBtn.setAttribute('aria-expanded', 'false');
+  var chat = document.createElement('div'); chat.id = 'ssChat'; chat.setAttribute('role', 'dialog'); chat.setAttribute('aria-label', 'Student Stay FAQ assistant');
+  chat.innerHTML = '<div id="ssLog" aria-live="polite"><p class="b">Hi! Ask me about fees, VAT, deposits or payments.</p></div><div class="ss-chips"></div>' +
+    '<form id="ssChatForm"><input id="ssChatIn" placeholder="Type a question" aria-label="Your question" maxlength="200"><button class="cta" style="padding:9px 14px">Send</button></form>';
+  document.body.appendChild(chat); document.body.appendChild(chatBtn);
+  function say(t, c) { var p = document.createElement('p'); p.className = c; p.textContent = t; $q('#ssLog').appendChild(p); $q('#ssLog').scrollTop = 1e5; }
+  function ask(q) { q = q.trim(); if (q) { say(q, 'u'); say(answer(q), 'b'); } }
+  ['What is the listing fee?', 'How do deposits work?', 'Is payment real?'].forEach(function (q) {
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = q; b.onclick = function () { ask(q); }; chat.querySelector('.ss-chips').appendChild(b);
+  });
+  $q('#ssChatForm').addEventListener('submit', function (e) { e.preventDefault(); ask($q('#ssChatIn').value); $q('#ssChatIn').value = ''; });
+  chatBtn.addEventListener('click', function () { var on = chat.classList.toggle('on'); chatBtn.setAttribute('aria-expanded', on); });
+})();
+
 </script>
 </body>
 </html>
