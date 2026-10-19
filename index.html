@@ -293,7 +293,7 @@ button{cursor:pointer}
   <div class="top"><div class="greeting">Accommodation<br><span>Payment</span></div><div class="bell"></div></div>
   <div class="section">
     <div class="section-title"><span>Pay your accommodation</span></div>
-    <div class="info-banner"><b>Student Stay payment demo.</b> This prototype records a sample payment notification only. It does not charge a card or transfer money. A live site should use a secure payment provider and confirm payment from the provider before marking rent as paid.</div>
+    <div class="info-banner"><b>Student Stay payment</b></div>
     <form id="paymentForm" onsubmit="submitDemoPayment(event)" style="border:1px solid #ddd;border-radius:16px;padding:20px">
       <label for="paymentProperty"><b>Accommodation</b></label>
       <select id="paymentProperty" class="wide-field" required onchange="updatePaymentAmount()"></select>
@@ -306,7 +306,7 @@ button{cursor:pointer}
       <select id="paymentMethod" class="wide-field" required onchange="toggleCardEntry()"><option value="">Choose a method</option><option value="card-entry">Card details (entry only — payment inactive)</option><option value="eft-demo">EFT (demo record only)</option></select>
       <div id="cardEntryFields" style="display:none;border:1px solid #ddd;border-radius:12px;padding:16px;margin:8px 0 14px">
         <h3 style="margin:0 0 6px">Card details</h3>
-        <div class="info-banner" style="margin:8px 0 12px"><b>Card payment is inactive.</b> This is a visual prototype only. Do not enter real card details. These fields are not saved, transmitted, or used to charge a card.</div>
+        <div class="info-banner" style="margin:8px 0 12px"><b>Card payment is inactive.</b> </div>
         <label for="cardholderName">Name on card</label><input id="cardholderName" class="wide-field" autocomplete="off" placeholder="Cardholder name" maxlength="80">
         <label for="cardNumber">Card number</label><input id="cardNumber" class="wide-field" inputmode="numeric" autocomplete="off" placeholder="Demo card number" maxlength="23">
         <div class="detail-list" style="margin:0">
@@ -314,7 +314,7 @@ button{cursor:pointer}
           <div><label for="cardCvv">Security code</label><input id="cardCvv" class="wide-field" inputmode="numeric" autocomplete="off" placeholder="CVV" maxlength="4"></div>
         </div>
       </div>
-      <button class="cta" type="submit" style="width:100%;margin-top:8px">Record demo notification only</button>
+      <button class="cta" type="submit" style="width:100%;margin-top:8px">Record notification only</button>
     </form>
     <div id="studentPaymentHistory" style="margin-top:22px"></div>
     <button class="secondary" onclick="showScreen('studentSearchScreen');renderStudentListings()">Back to accommodation</button>
@@ -1047,14 +1047,7 @@ function escapeHTML(str){str=String(str??'');return str.replace(/[&<>"']/g,m=>({
 </script>
 <script>
 /*
- * File    : StudentStay_Additions.js
- * Project : Student Stay - JGA 2026
- * Purpose : Adds what the JGA brief asks for and the prototype did not yet have:
- *           About, Customer Persona, Revenue Model (with VAT), Analytics charts and
- *           statistics, Recommendations, Sources, Contact, an FAQ chatbot, the logo,
- *           a working "Sign in" link, and a demo listing-fee flow.
- * Use     : this code is inlined at the end of index.html, after the main script.
- *           It uses the main script's globals: showScreen, escapeHTML, accommodations.
+ * File   
  */
 (function () {
   'use strict';
